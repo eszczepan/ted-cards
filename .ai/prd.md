@@ -2,7 +2,7 @@
 
 ## 1. Przegląd produktu
 
-TedCards to aplikacja webowa, która automatycznie generuje fiszki edukacyjne z napisów pobranych z filmów YouTube. System integruje mechanizm przetwarzania napisów oraz generowania treści fiszek za pomocą AI, umożliwiając użytkownikom szybką naukę nowych słówek w kontekście zdań i przykładów. Aplikacja obsługuje języki polski i angielski, z automatyczną detekcją języka przy pierwszym uruchomieniu oraz możliwością zmiany w późniejszym czasie. Ponadto, użytkownik ma możliwość manualnego tworzenia fiszek, co pozwala na pełną personalizację nauki.
+TedCards to aplikacja webowa, której kluczową funkcjonalnością jest automatyczne generowanie fiszek edukacyjnych z napisów pobranych z filmów YouTube. System integruje mechanizm przetwarzania napisów oraz generowania treści fiszek za pomocą AI, umożliwiając użytkownikom szybką naukę nowych słówek w kontekście zdań i przykładów. Aplikacja obsługuje języki polski i angielski. Ponadto, użytkownik ma możliwość manualnego tworzenia fiszek, co pozwala na pełną personalizację nauki.
 
 ## 2. Problem użytkownika
 

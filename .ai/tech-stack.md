@@ -6,12 +6,14 @@
 - Shadcn/ui jako biblioteka gotowych, dostępnych komponentów UI
 - Framer Motion do płynnych animacji komponentów
 - GSAP dla zaawansowanych animacji i interakcji
+- Zod do walidacji danych w formularzach i typów runtime
 
 # Backend i Baza Danych:
 
 - Next.js API Routes jako warstwa backendowa aplikacji
 - Supabase dostarczający bazę PostgreSQL, autentykację i autoryzację
 - Wbudowane SDK Supabase dla łatwej integracji z Next.js
+- Zod do walidacji danych na poziomie API i formularzy
 
 # AI - Integracja z modelami językowymi:
 
