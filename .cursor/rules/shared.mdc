@@ -1,0 +1,65 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# AI Rules for Ted Cards
+
+TedCards is a web application that enables the automatic generation of flashcards from YouTube links using artificial intelligence. The aim of the project is to significantly speed up and simplify the process of creating flashcards, enabling users to quickly transform the YouTube videos (via link) into high-quality flashcards for learning.
+
+## Tech Stack
+
+- Next.js 15
+- TypeScript 5
+- Tailwind 4
+- Shadcn/ui
+- Framer Motion
+
+## Project Structure
+
+When introducing changes to the project, always follow the directory structure below:
+
+- `./app` - Application routes layer (Next.js App Router)  
+  - `(public)/` - Public routes (accessible without authentication)  
+    - `page.tsx` - Landing page  
+    - `login/` - Login route  
+    - `signup/` - Signup route  
+  - `dashboard/` - Protected user dashboard  
+- `./db` - Data layer – Supabase client and helper  
+- `./components` - UI and layout components  
+  - `ui/` - Client-side components from Shadcn/ui  
+  - `layout/` - Layout components (e.g., header, sidebar, footer)  
+  - `shared/` - Shared reusable components (e.g., buttons, inputs, modals)  
+  - `animations/` - Motion components (Motion library)  
+  - `hooks/` - Custom React hooks for reusable logic (e.g., useUser, useScroll, useDebounce)  
+- `./lib` - Business logic, integrations, utilities  
+  - `utils/` - General utility functions  
+- `./public` - Public assets (images, favicon, Open Graph)  
+- `./styles/globals.css` - Global CSS including Tailwind base  
+- `./middlewares/middleware.ts` - Global Next.js middleware  
+- `./next.config.ts` - Next.js configuration  
+- `./tsconfig.json` - TypeScript configuration  
+- `./tailwind.config.ts` - Tailwind v4 configuration  
+- `./package.json` - Project dependencies and scripts  
+- `./README.md` - Project documentation
+
+When modifying the directory structure, always update this section.
+
+## Coding practices
+
+You are a Senior Front-End Developer and an Expert in NextJS, JavaScript, TypeScript, HTML, Tailwind and Motion (Previously Framer Motion). You are thoughtful, give nuanced answers, and are brilliant at reasoning. You carefully provide accurate, factual, thoughtful answers, and are a genius at reasoning.
+
+### Guidelines for clean code
+
+- Always write correct, best practice, DRY principle (Dont Repeat Yourself)
+- Focus on easy and readability code, over being performant.
+- Use feedback from linters to improve the code when making changes.
+- Prioritize error handling and edge cases.
+- Handle errors and edge cases at the beginning of functions.
+- Use early returns for error conditions to avoid deeply nested if statements.
+- Place the happy path last in the function for improved readability.
+- Avoid unnecessary else statements; use if-return pattern instead.
+- Use guard clauses to handle preconditions and invalid states early.
+- Implement proper error logging and user-friendly error messages.
+- Consider using custom error types or error factories for consistent error handling.
+- Use functions instead of const, for example, function toggle() {}”. Also, define a type if possible.

@@ -1,0 +1,68 @@
+---
+description: 
+globs: *.tsx
+alwaysApply: false
+---
+## Frontend
+
+
+### Guidelines for Next.js
+
+- Use App Router and Server Components for improved performance and SEO
+- Implement route handlers for API endpoints instead of the pages/api directory
+- Use server actions for form handling and data mutations from Server Components
+- Leverage Next.js Image component with proper sizing for core web vitals optimization
+- Implement the Metadata API for dynamic SEO optimization
+- Use React Server Components for data fetching operations to reduce client-side JavaScript
+- Use URL search params to manage the search state
+- Implement Streaming and Suspense for improved loading states
+- Use the new Link component without requiring a child <a> tag
+- Leverage parallel routes for complex layouts and parallel data fetching
+- Use POST, GET  - uppercase format for endpoint handlers
+- Implement intercepting routes for modal patterns and nested UIs
+- Consider using the new useOptimistic hook for optimistic UI updates in forms before the Server Action finishes executing, rather than waiting for the response
+- Extract logic into custom hooks in `components/hooks`
+- Implement validation using Zod for schema validation.
+
+
+### Optimization and Best Practices
+
+- Minimize the use of `'use client'`, `useEffect`, and `setState`; favor React Server Components (RSC) and Next.js SSR features.
+- Implement dynamic imports for code splitting and optimization.
+- Use responsive design with a mobile-first approach.
+- Optimize images: use WebP format, include size data, implement lazy loading.
+- Implement proper error handling, user input validation, and secure coding practices.
+- Follow performance optimization techniques, such as reducing load times and improving rendering efficiency.
+
+### Guidelines for Styling
+
+- Use modern UI frameworks (Tailwind CSS, Shadcn UI) for styling.
+- Implement consistent design and responsive patterns across platforms.
+- Use a "New York" variant for Shadcn style with a base color of “neutral” and CSS variables to create themes.
+
+#### Tailwind
+
+- Use the @layer directive to organize styles into components, utilities, and base layers
+- Use arbitrary values with square brackets (e.g., w-[123px]) for precise one-off designs
+- Implement the Tailwind configuration file for customizing theme, plugins, and variants
+- Leverage the theme() function in CSS for accessing Tailwind theme values
+- Implement dark mode with the dark: variant
+- Use responsive variants (sm:, md:, lg:, etc.) for adaptive designs
+- Leverage state variants (hover:, focus-visible:, active:, etc.) for interactive elements
+
+### Guidelines for Accessibility
+
+#### ARIA Best Practices
+
+- Use ARIA landmarks to identify regions of the page (main, navigation, search, etc.)
+- Apply appropriate ARIA roles to custom interface elements that lack semantic HTML equivalents
+- Set aria-expanded and aria-controls for expandable content like accordions and dropdowns
+- Use aria-live regions with appropriate politeness settings for dynamic content updates
+- Implement aria-hidden to hide decorative or duplicative content from screen readers
+- Apply aria-label or aria-labelledby for elements without visible text labels
+- Use aria-describedby to associate descriptive text with form inputs or complex elements
+- Implement aria-current for indicating the current item in a set, navigation, or process
+- Avoid redundant ARIA that duplicates the semantics of native HTML elements
+
+
+    
