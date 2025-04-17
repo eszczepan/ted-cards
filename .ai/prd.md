@@ -21,6 +21,7 @@ Użytkownicy często napotykają na problem czasochłonności i dezorientacji pr
 - Bulkowy zapis decyzji użytkownika – zaakceptowane fiszki trafiają do bazy danych.
 - Rejestrowanie logów statusów akceptacji fiszek w dedykowanej tabeli bazy danych.
 - Wielowarstwowa walidacja danych (frontend, backend, baza) z informacyjnymi alertami w przypadku błędów.
+- Fiszki mogą być generowane z dwóch źródeł: YouTube link lub tekst wklejony przez użytkownika.
 
 2. Ręcznie tworzenie i zarządzanie fiszkami:
 
@@ -165,6 +166,15 @@ Kryteria akceptacji:
 - Przy każdej fiszce na liście (w widoku "Moje fiszki") widoczna jest opcja usunięcia.
 - Po wybraniu usuwania użytkownik musi potwierdzić operację, zanim fiszka zostanie trwale usunięta.
 - Fiszki zostają trwale usunięte z bazy danych po potwierdzeniu.
+
+ID: US-012
+Tytuł: Automatyczne generowanie fiszek z wklejonego tekst przy uzyciu AI
+Opis: Jako użytkownik, chcę wkleić tekst, aby system wygenerował z niego fiszki, zachowując ograniczenia znaków oraz generując poziom CEFR.
+Kryteria akceptacji:
+
+- System komunikuje sie z API modelu LLM i generuje fiszki
+- Automatycznie generowany poziom CEFR.
+- Wyswietlana jest lista wygenerowanych propozycji fiszek do akceptacji przez uzytkownika
 
 ## 6. Metryki sukcesu
 
