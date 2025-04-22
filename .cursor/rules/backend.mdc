@@ -1,0 +1,17 @@
+---
+description: 
+globs: middleware.ts,supabase/*.ts,app/auth/actions.ts
+alwaysApply: false
+---
+### Backend and Database
+
+- Use Supabase for backend services, including authentication and database interactions.
+- Follow Supabase guidelines for security and performance.
+- Use Zod schemas to validate data exchanged with the backend.
+- Use Server-Side Auth for Next.js 
+- Use Client Component client from `supabase/supabase.client.ts` - to access Supabase from Client Components, which run in the browser.
+- Use Server Component client from `supabase/supabase.server.ts` - to access Supabase from Server Components, Server Actions, and Route Handlers, which run only on the server.
+- Use middleware `supabase/middleware.ts` and `middleware.ts` that are responsible for:
+    1. Refreshing the Auth token (by calling `supabase.auth.getUser`).
+    2. Passing the refreshed Auth token to Server Components, so they don't attempt to refresh the same token themselves. This is accomplished with `request.cookies.set`.
+    3. Passing the refreshed Auth token to the browser, so it replaces the old token. This is accomplished with `response.cookies.set`.
