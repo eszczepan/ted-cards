@@ -32,3 +32,7 @@ export async function createClient() {
     }
   );
 }
+
+export type SupabaseClient = typeof createClient;
+
+export const DEFAULT_USER_ID = "2cd30b10-8b24-466c-8c19-a0c6aad7f901";
