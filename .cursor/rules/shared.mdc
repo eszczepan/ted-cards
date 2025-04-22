@@ -25,7 +25,6 @@ When introducing changes to the project, always follow the directory structure b
     - `login/` - Login route  
     - `signup/` - Signup route  
   - `dashboard/` - Protected user dashboard  
-- `./db` - Data layer – Supabase client and helper  
 - `./components` - UI and layout components  
   - `ui/` - Client-side components from Shadcn/ui  
   - `layout/` - Layout components (e.g., header, sidebar, footer)  
