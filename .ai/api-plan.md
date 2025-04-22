@@ -35,6 +35,7 @@
         "cefr_level": "string",
         "source": "string",
         "source_youtube_url": "string",
+        "generation_id": "uuid",
         "status": "string",
         "created_at": "timestamp",
         "updated_at": "timestamp"
@@ -65,6 +66,7 @@
     "cefr_level": "string",
     "source": "string",
     "source_youtube_url": "string",
+    "generation_id": "uuid",
     "status": "string",
     "created_at": "timestamp",
     "updated_at": "timestamp"
@@ -108,6 +110,7 @@
         "cefr_level": "string",
         "source": "string",
         "source_youtube_url": "string",
+        "generation_id": "uuid",
         "status": "string",
         "created_at": "timestamp",
         "updated_at": "timestamp"
@@ -163,7 +166,7 @@
   {
     "id": "uuid",
     "status": "string (e.g., pending, completed, error)",
-    "generated_flashcards": [
+    "flashcard_proposals": [
       {
         "id": "uuid (temporary)",
         "front_content": "string",
@@ -229,7 +232,7 @@
     "source_youtube_url": "string",
     "source_text_length": "number",
     "created_at": "timestamp",
-    "generated_flashcards": [
+    "flashcard_proposals": [
       {
         "id": "uuid (temporary)",
         "front_content": "string",

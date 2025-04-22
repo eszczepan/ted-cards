@@ -128,6 +128,7 @@ export type FlashcardDTO = Pick<
   | "cefr_level"
   | "source"
   | "source_youtube_url"
+  | "generation_id"
   | "status"
   | "created_at"
   | "updated_at"
