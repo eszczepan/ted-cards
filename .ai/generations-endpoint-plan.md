@@ -66,6 +66,8 @@ Endpoint służy do uruchomienia procesu generacji propozycji fiszek na podstawi
    - Inicjuje proces generacji fiszek (poprzez integrację z zewnętrznym systemem AI, np. Openrouter.ai).
    - Oblicza statystyki generacji, mierzy czas i liczbę wygenerowanych propozycji.
 4. Zapis danych do tabeli `generations` (i ewentualnie do tabeli `flashcards` dla wygenerowanych fiszek).
+   - W przypadku tworzenia fiszek na podstawie propozycji, zapisywane jest powiązanie poprzez `generation_id` w tabeli `flashcards`.
+   - W przyszłości można wykorzystać `generation_id` do analizy efektywności generacji i śledzenia, które propozycje zostały zaakceptowane.
 5. Wysłanie odpowiedzi JSON do klienta.
 
 ## 6. Względy bezpieczeństwa
