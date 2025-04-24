@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "@/styles/globals.css";
+import { Button } from "@/components/ui/button";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Ted Cards - 2025",
-  description: "Ted Cards - 2025",
+  title: "TedCards - AI-powered Flashcards",
+  description: "Generate flashcards from YouTube videos using AI",
 };
 
 export default function PublicLayout({
@@ -28,14 +29,21 @@ export default function PublicLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <nav className="flex p-4 gap-4">
-          <Link href="/">Home</Link>
-          <Link href="/login">Login</Link>
-          <Link href="/signup">Signup</Link>
-        </nav>
-        <div className="flex flex-col items-center justify-center h-screen">
-          {children}
-        </div>
+        <header className="w-full fixed top-0 z-50 border-b bg-background/95 backdrop-blur">
+          <div className="container max-w-screen-xl mx-auto flex items-center justify-between h-16 px-4 md:px-6">
+            <Link
+              href="/"
+              className="flex items-center gap-2 font-bold text-xl"
+            >
+              <span className="sr-only">TedCards</span>
+              TedCards
+            </Link>
+            <Link href="/login">
+              <Button>Login</Button>
+            </Link>
+          </div>
+        </header>
+        <main className="flex-1 pt-16">{children}</main>
       </body>
     </html>
   );
