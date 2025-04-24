@@ -6,7 +6,7 @@ Widok Dashboard (`/dashboard`) jest głównym interfejsem dla zalogowanych użyt
 
 ## 2. Routing widoku
 
-Widok powinien być dostępny pod ścieżką `/dashboard`. Dostęp do tej ścieżki powinien wymagać autentykacji użytkownika (co zostanie obsłużone przez globalny middleware lub layout chroniony).
+Widok powinien być dostępny pod ścieżką `/dashboard`.
 
 ## 3. Struktura komponentów
 
@@ -42,7 +42,7 @@ app/dashboard/page.tsx (DashboardView)
 
 ### `DashboardView` (`app/dashboard/page.tsx`)
 
-- **Opis:** Główny kontener widoku. Zarządza stanem całego widoku (za pomocą customowego hooka `useDashboard`), obsługuje wywołania API do generowania i zapisywania fiszek, renderuje `GenerationForm` i `ProposalList`.
+- **Opis:** Główny kontener widoku. Renderuje `GenerationForm` i `ProposalList`.
 - **Główne elementy:** `GenerationForm`, `ProposalList`.
 - **Obsługiwane interakcje:** Deleguje obsługę zdarzeń do komponentów potomnych i hooka `useDashboard`.
 - **Obsługiwana walidacja:** Brak bezpośredniej walidacji.
@@ -68,7 +68,7 @@ app/dashboard/page.tsx (DashboardView)
 
 ### `SourceTypeSwitcher` (`components/dashboard/SourceTypeSwitcher.tsx`)
 
-- **Opis:** Komponent zakładek (np. Shadcn `Tabs`) do wyboru źródła danych (YouTube/Text). Powinien używać `Framer Motion` do animacji przejścia.
+- **Opis:** Komponent zakładek (np. Shadcn `Tabs`) do wyboru źródła danych (YouTube/Text). Powinien używać `motion/react` do animacji przejścia.
 - **Główne elementy:** Komponent `Tabs` z Shadcn/ui.
 - **Obsługiwane interakcje:** Kliknięcie na zakładkę.
 - **Obsługiwana walidacja:** Brak.
@@ -173,7 +173,7 @@ Zaleca się stworzenie customowego hooka, np. `useDashboard`, który będzie her
 
 ## 8. Interakcje użytkownika
 
-- **Wybór typu źródła:** Zmienia widoczne pola w formularzu (URL vs Text Area). Animacja przejścia (`Framer Motion`).
+- **Wybór typu źródła:** Zmienia widoczne pola w formularzu (URL vs Text Area). Animacja przejścia (`motion/react`).
 - **Wprowadzanie danych:** Aktualizacja stanu formularza, walidacja na bieżąco, aktualizacja licznika znaków.
 - **Kliknięcie "Generate":** Rozpoczęcie procesu generacji, wyświetlenie stanu ładowania, zablokowanie formularza.
 - **Przeglądanie propozycji:** Lista fiszek renderowana po zakończeniu generacji. Wszystkie fiszki mają domyślnie status `ACCEPTED`.
@@ -219,7 +219,7 @@ Zaleca się stworzenie customowego hooka, np. `useDashboard`, który będzie her
 2.  **Implementacja hooka `useDashboard`:** Zdefiniuj `DashboardViewModel`, zaimplementuj logikę zarządzania stanem, funkcje obsługi API. Ustaw domyślny status propozycji na `ACCEPTED` po generacji. Dodaj funkcję `handleSaveAll`. Zmień nazwę `handleSave` na `handleSaveAccepted`.
 3.  **Implementacja `DashboardView`:** Podłącz hook `useDashboard`, przekaż stan i funkcje obsługi do komponentów potomnych `GenerationForm` i `ProposalList`.
 4.  **Implementacja `GenerationForm`:** Zbuduj strukturę formularza używając komponentów Shadcn/ui. Podłącz propsy z `DashboardView`/`useDashboard` do obsługi stanu, walidacji i wysyłania. Zintegruj `SourceTypeSwitcher` i `CharacterCounter`. Dodaj obsługę wyświetlania błędów walidacji.
-5.  **Implementacja `SourceTypeSwitcher`:** Użyj komponentu `Tabs` z Shadcn i dodaj animacje za pomocą `Framer Motion`.
+5.  **Implementacja `SourceTypeSwitcher`:** Użyj komponentu `Tabs` z Shadcn i dodaj animacje za pomocą `motion/react`.
 6.  **Implementacja `ProposalList`:** Zbuduj strukturę listy. Dodaj przycisk "Zapisz wszystkie" i podłącz go do `onSaveAll`. Zmień podłączenie przycisku "Zapisz zaakceptowane" do `onSaveAccepted`. Dodaj warunki deaktywacji przycisków.
 7.  **Implementacja `ProposalCard`:** Zbuduj strukturę karty. Ustaw wizualizację domyślnego stanu `ACCEPTED`. Zmodyfikuj logikę przycisku "Akceptuj", aby był aktywny tylko dla statusu `REJECTED`.
 8.  **Integracja API:** Upewnij się, że obie akcje zapisu (`handleSaveAll` i `handleSaveAccepted`) poprawnie filtrują propozycje i wysyłają dane do `POST /api/flashcards`.
