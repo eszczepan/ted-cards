@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { CEFR_LEVEL, FLASHCARD_SOURCE, FLASHCARD_STATUS } from "@/types";
 
-// Schema for individual flashcard in request
 export const createFlashcardSchema = z.object({
   front_content: z
     .string()
@@ -49,7 +48,6 @@ export const createFlashcardsSchema = z
   })
   .refine(
     (data) => {
-      // Check if all flashcards with YouTube source have a valid URL
       return !data.flashcards.some(
         (card) =>
           (card.source === FLASHCARD_SOURCE.AI_YOUTUBE_FULL ||
@@ -63,7 +61,6 @@ export const createFlashcardsSchema = z
     }
   );
 
-// Schema for response
 export const flashcardResponseSchema = z.object({
   id: z.string().uuid(),
   front_content: z.string(),
@@ -98,7 +95,6 @@ export const createFlashcardsResponseSchema = z.object({
   flashcards: z.array(flashcardResponseSchema),
 });
 
-// Type inference
 export type CreateFlashcardRequest = z.infer<typeof createFlashcardSchema>;
 export type CreateFlashcardsRequest = z.infer<typeof createFlashcardsSchema>;
 export type FlashcardResponse = z.infer<typeof flashcardResponseSchema>;
