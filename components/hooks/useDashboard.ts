@@ -38,10 +38,7 @@ export function useDashboard() {
   });
 
   // Form input handlers
-  function handleInputChange(
-    field: keyof CreateGenerationCommand,
-    value: string
-  ) {
+  function handleInputChange(field: keyof CreateGenerationCommand, value: string) {
     setState((prev) => ({
       ...prev,
       formInput: {
@@ -59,9 +56,7 @@ export function useDashboard() {
         ...prev.formInput,
         source_type: sourceType,
         // Clear the irrelevant field based on the new source type
-        ...(sourceType === SOURCE_TYPE.YOUTUBE
-          ? { source_text: "" }
-          : { source_youtube_url: "" }),
+        ...(sourceType === SOURCE_TYPE.YOUTUBE ? { source_text: "" } : { source_youtube_url: "" }),
       },
     }));
   }
@@ -77,28 +72,36 @@ export function useDashboard() {
     }));
 
     try {
+      const requestData = { ...data };
+
+      if (data.source_type === SOURCE_TYPE.YOUTUBE) {
+        // When using YouTube source, ensure source_text is valid but empty
+        requestData.source_text = requestData.source_text || "";
+      } else if (data.source_type === SOURCE_TYPE.TEXT) {
+        // When using Text source, ensure source_youtube_url is empty
+        requestData.source_youtube_url = "";
+      }
+
       const response = await fetch("/api/generations", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(requestData),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to generate flashcards");
+        throw new Error(errorData.message || errorData.details?._errors?.[0] || "Failed to generate flashcards");
       }
 
       const responseData = await response.json();
 
       // Set all proposals to ACCEPTED by default
-      const proposalsWithDefaultStatus = responseData.flashcard_proposals.map(
-        (proposal: FlashcardProposalDTO) => ({
-          ...proposal,
-          status: FLASHCARD_PROPOSAL_STATUS.ACCEPTED,
-        })
-      );
+      const proposalsWithDefaultStatus = responseData.flashcard_proposals.map((proposal: FlashcardProposalDTO) => ({
+        ...proposal,
+        status: FLASHCARD_PROPOSAL_STATUS.ACCEPTED,
+      }));
 
       setState((prev) => ({
         ...prev,
@@ -110,8 +113,7 @@ export function useDashboard() {
       setState((prev) => ({
         ...prev,
         generationState: "error",
-        generationError:
-          error instanceof Error ? error.message : "An unknown error occurred",
+        generationError: error instanceof Error ? error.message : "An unknown error occurred",
       }));
     }
   }
@@ -119,9 +121,7 @@ export function useDashboard() {
   function handleUpdateProposal(updatedProposal: FlashcardProposalDTO) {
     setState((prev) => ({
       ...prev,
-      proposals: prev.proposals.map((proposal) =>
-        proposal.id === updatedProposal.id ? updatedProposal : proposal
-      ),
+      proposals: prev.proposals.map((proposal) => (proposal.id === updatedProposal.id ? updatedProposal : proposal)),
     }));
   }
 
@@ -130,8 +130,7 @@ export function useDashboard() {
 
     const acceptedProposals = state.proposals.filter(
       (proposal) =>
-        proposal.status === FLASHCARD_PROPOSAL_STATUS.ACCEPTED ||
-        proposal.status === FLASHCARD_PROPOSAL_STATUS.EDITED
+        proposal.status === FLASHCARD_PROPOSAL_STATUS.ACCEPTED || proposal.status === FLASHCARD_PROPOSAL_STATUS.EDITED
     );
 
     if (acceptedProposals.length === 0) return;
@@ -143,17 +142,15 @@ export function useDashboard() {
     }));
 
     try {
-      const flashcardsToSave: CreateFlashcardDTO[] = acceptedProposals.map(
-        (proposal) => ({
-          front_content: proposal.front_content,
-          back_content: proposal.back_content,
-          front_language: proposal.front_language,
-          back_language: proposal.back_language,
-          cefr_level: proposal.cefr_level,
-          source: proposal.source,
-          source_youtube_url: state.formInput.source_youtube_url,
-        })
-      );
+      const flashcardsToSave: CreateFlashcardDTO[] = acceptedProposals.map((proposal) => ({
+        front_content: proposal.front_content,
+        back_content: proposal.back_content,
+        front_language: proposal.front_language,
+        back_language: proposal.back_language,
+        cefr_level: proposal.cefr_level,
+        source: proposal.source,
+        source_youtube_url: state.formInput.source_youtube_url,
+      }));
 
       const response = await fetch("/api/flashcards", {
         method: "POST",
@@ -181,8 +178,7 @@ export function useDashboard() {
       setState((prev) => ({
         ...prev,
         saveState: "error",
-        saveError:
-          error instanceof Error ? error.message : "An unknown error occurred",
+        saveError: error instanceof Error ? error.message : "An unknown error occurred",
       }));
     }
   }
@@ -203,17 +199,15 @@ export function useDashboard() {
     }));
 
     try {
-      const flashcardsToSave: CreateFlashcardDTO[] = nonRejectedProposals.map(
-        (proposal) => ({
-          front_content: proposal.front_content,
-          back_content: proposal.back_content,
-          front_language: proposal.front_language,
-          back_language: proposal.back_language,
-          cefr_level: proposal.cefr_level,
-          source: proposal.source,
-          source_youtube_url: state.formInput.source_youtube_url,
-        })
-      );
+      const flashcardsToSave: CreateFlashcardDTO[] = nonRejectedProposals.map((proposal) => ({
+        front_content: proposal.front_content,
+        back_content: proposal.back_content,
+        front_language: proposal.front_language,
+        back_language: proposal.back_language,
+        cefr_level: proposal.cefr_level,
+        source: proposal.source,
+        source_youtube_url: state.formInput.source_youtube_url,
+      }));
 
       const response = await fetch("/api/flashcards", {
         method: "POST",
@@ -241,8 +235,7 @@ export function useDashboard() {
       setState((prev) => ({
         ...prev,
         saveState: "error",
-        saveError:
-          error instanceof Error ? error.message : "An unknown error occurred",
+        saveError: error instanceof Error ? error.message : "An unknown error occurred",
       }));
     }
   }

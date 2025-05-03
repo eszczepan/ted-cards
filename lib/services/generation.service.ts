@@ -3,7 +3,6 @@ import { createClient } from "@/supabase/supabase.server";
 import crypto from "crypto";
 import {
   SOURCE_TYPE,
-  CefrLevel,
   FLASHCARD_SOURCE,
   FLASHCARD_PROPOSAL_STATUS,
   FlashcardProposalDTO,
@@ -146,21 +145,157 @@ export class GenerationService {
         ? FLASHCARD_SOURCE.AI_YOUTUBE_FULL
         : FLASHCARD_SOURCE.AI_TEXT_FULL;
 
-    // Generate between 5-10 mock proposals
-    const count = Math.floor(Math.random() * 6) + 5;
-    const cefrLevels: CefrLevel[] = ["A1", "A2", "B1", "B2", "C1", "C2"];
-
-    return Array.from({ length: count }, (_, i) => ({
-      id: uuidv4(),
-      front_content: `Example front content ${i + 1}`,
-      back_content: `Example back content ${
-        i + 1
-      } with more detailed explanation.`,
-      front_language,
-      back_language,
-      cefr_level: cefrLevels[Math.floor(Math.random() * cefrLevels.length)],
-      source,
-      status: FLASHCARD_PROPOSAL_STATUS.PENDING,
-    }));
+    // Create more realistic mock data based on source type
+    if (source_type === SOURCE_TYPE.YOUTUBE) {
+      return [
+        {
+          id: uuidv4(),
+          front_content: "machine learning",
+          back_content:
+            "A subset of artificial intelligence that enables a system to learn from data without being explicitly programmed.",
+          front_language,
+          back_language,
+          cefr_level: "B2",
+          source,
+          status: FLASHCARD_PROPOSAL_STATUS.PENDING,
+        },
+        {
+          id: uuidv4(),
+          front_content: "neural network",
+          back_content:
+            "A computing system inspired by biological neural networks that can learn to perform tasks by considering examples.",
+          front_language,
+          back_language,
+          cefr_level: "C1",
+          source,
+          status: FLASHCARD_PROPOSAL_STATUS.PENDING,
+        },
+        {
+          id: uuidv4(),
+          front_content: "deep learning",
+          back_content:
+            "A subset of machine learning where artificial neural networks learn from large amounts of data.",
+          front_language,
+          back_language,
+          cefr_level: "B2",
+          source,
+          status: FLASHCARD_PROPOSAL_STATUS.PENDING,
+        },
+        {
+          id: uuidv4(),
+          front_content: "supervised learning",
+          back_content:
+            "A type of machine learning where the model is trained on labeled data to make predictions or decisions.",
+          front_language,
+          back_language,
+          cefr_level: "B1",
+          source,
+          status: FLASHCARD_PROPOSAL_STATUS.PENDING,
+        },
+        {
+          id: uuidv4(),
+          front_content: "reinforcement learning",
+          back_content:
+            "A type of machine learning where an agent learns to make decisions by taking actions in an environment to maximize a reward.",
+          front_language,
+          back_language,
+          cefr_level: "C1",
+          source,
+          status: FLASHCARD_PROPOSAL_STATUS.PENDING,
+        },
+        {
+          id: uuidv4(),
+          front_content: "artificial intelligence",
+          back_content:
+            "The simulation of human intelligence in machines that are programmed to think and learn like humans.",
+          front_language,
+          back_language,
+          cefr_level: "A2",
+          source,
+          status: FLASHCARD_PROPOSAL_STATUS.PENDING,
+        },
+        {
+          id: uuidv4(),
+          front_content: "bias in machine learning",
+          back_content:
+            "When a machine learning model produces results that are systematically prejudiced due to erroneous assumptions in the training process.",
+          front_language,
+          back_language,
+          cefr_level: "C2",
+          source,
+          status: FLASHCARD_PROPOSAL_STATUS.PENDING,
+        },
+      ];
+    } else {
+      // Text source
+      return [
+        {
+          id: uuidv4(),
+          front_content: "global warming",
+          back_content:
+            "The long-term heating of Earth's climate system observed since the pre-industrial period due to human activities.",
+          front_language,
+          back_language,
+          cefr_level: "B1",
+          source,
+          status: FLASHCARD_PROPOSAL_STATUS.PENDING,
+        },
+        {
+          id: uuidv4(),
+          front_content: "carbon footprint",
+          back_content:
+            "The total amount of greenhouse gases produced to directly and indirectly support human activities, usually expressed in equivalent tons of carbon dioxide (CO2).",
+          front_language,
+          back_language,
+          cefr_level: "B2",
+          source,
+          status: FLASHCARD_PROPOSAL_STATUS.PENDING,
+        },
+        {
+          id: uuidv4(),
+          front_content: "renewable energy",
+          back_content:
+            "Energy from sources that are naturally replenishing but flow-limited, such as sunlight, wind, rain, tides, waves, and geothermal heat.",
+          front_language,
+          back_language,
+          cefr_level: "A2",
+          source,
+          status: FLASHCARD_PROPOSAL_STATUS.PENDING,
+        },
+        {
+          id: uuidv4(),
+          front_content: "greenhouse effect",
+          back_content:
+            "The trapping of the sun's warmth in a planet's lower atmosphere, due to the greater transparency of the atmosphere to visible radiation from the sun than to infrared radiation emitted from the planet's surface.",
+          front_language,
+          back_language,
+          cefr_level: "B2",
+          source,
+          status: FLASHCARD_PROPOSAL_STATUS.PENDING,
+        },
+        {
+          id: uuidv4(),
+          front_content: "climate change",
+          back_content:
+            "A long-term change in the average weather patterns that have come to define Earth's local, regional and global climates.",
+          front_language,
+          back_language,
+          cefr_level: "A1",
+          source,
+          status: FLASHCARD_PROPOSAL_STATUS.PENDING,
+        },
+        {
+          id: uuidv4(),
+          front_content: "sustainable development",
+          back_content:
+            "Development that meets the needs of the present without compromising the ability of future generations to meet their own needs.",
+          front_language,
+          back_language,
+          cefr_level: "C1",
+          source,
+          status: FLASHCARD_PROPOSAL_STATUS.PENDING,
+        },
+      ];
+    }
   }
 }

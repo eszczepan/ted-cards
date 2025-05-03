@@ -1,32 +1,30 @@
 import { z } from "zod";
-import {
-  SOURCE_TYPE,
-  CEFR_LEVEL,
-  FLASHCARD_SOURCE,
-  FLASHCARD_PROPOSAL_STATUS,
-} from "@/types";
+import { SOURCE_TYPE, CEFR_LEVEL, FLASHCARD_SOURCE, FLASHCARD_PROPOSAL_STATUS } from "@/types";
 
-// Request validation schema
-export const createGenerationSchema = z
-  .object({
-    source_type: z.enum([SOURCE_TYPE.YOUTUBE, SOURCE_TYPE.TEXT]),
-    source_text: z.string().max(15000, "Text cannot exceed 15000 characters"),
-    source_youtube_url: z.string().url("Invalid YouTube URL").optional(),
-    front_language: z.string().min(2, "Front language is required"),
-    back_language: z.string().min(2, "Back language is required"),
-  })
-  .refine(
-    (data) => {
-      // YouTube URL is required when source type is 'youtube'
-      return !(
-        data.source_type === SOURCE_TYPE.YOUTUBE && !data.source_youtube_url
-      );
-    },
-    {
-      message: "YouTube URL is required when source type is 'youtube'",
-      path: ["source_youtube_url"],
-    }
-  );
+const youtubeUrlSchema = z.string().url("Invalid YouTube URL");
+const sourceTextSchema = z.string().max(15000, "Text cannot exceed 15000 characters");
+const languageSchema = z.string().min(2, "Language code is required");
+
+const youtubeGenerationSchema = z.object({
+  source_type: z.literal(SOURCE_TYPE.YOUTUBE),
+  source_youtube_url: youtubeUrlSchema,
+  source_text: sourceTextSchema.optional(),
+  front_language: languageSchema,
+  back_language: languageSchema,
+});
+
+const textGenerationSchema = z.object({
+  source_type: z.literal(SOURCE_TYPE.TEXT),
+  source_text: sourceTextSchema.min(1, "Source text is required"),
+  source_youtube_url: z.string().optional(),
+  front_language: languageSchema,
+  back_language: languageSchema,
+});
+
+export const createGenerationSchema = z.discriminatedUnion("source_type", [
+  youtubeGenerationSchema,
+  textGenerationSchema,
+]);
 
 // Schemas for response validation
 export const flashcardProposalSchema = z.object({
@@ -35,14 +33,7 @@ export const flashcardProposalSchema = z.object({
   back_content: z.string(),
   front_language: z.string(),
   back_language: z.string(),
-  cefr_level: z.enum([
-    CEFR_LEVEL.A1,
-    CEFR_LEVEL.A2,
-    CEFR_LEVEL.B1,
-    CEFR_LEVEL.B2,
-    CEFR_LEVEL.C1,
-    CEFR_LEVEL.C2,
-  ]),
+  cefr_level: z.enum([CEFR_LEVEL.A1, CEFR_LEVEL.A2, CEFR_LEVEL.B1, CEFR_LEVEL.B2, CEFR_LEVEL.C1, CEFR_LEVEL.C2]),
   source: z.enum([
     FLASHCARD_SOURCE.AI_YOUTUBE_FULL,
     FLASHCARD_SOURCE.AI_YOUTUBE_EDITED,
@@ -70,6 +61,4 @@ export const createGenerationResponseSchema = z.object({
 // Type inference
 export type CreateGenerationRequest = z.infer<typeof createGenerationSchema>;
 export type FlashcardProposalResponse = z.infer<typeof flashcardProposalSchema>;
-export type CreateGenerationResponse = z.infer<
-  typeof createGenerationResponseSchema
->;
+export type CreateGenerationResponse = z.infer<typeof createGenerationResponseSchema>;
