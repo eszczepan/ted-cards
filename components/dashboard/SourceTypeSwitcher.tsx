@@ -7,16 +7,9 @@ type SourceTypeSwitcherProps = {
   onChange: (value: SourceType) => void;
 };
 
-export function SourceTypeSwitcher({
-  value,
-  onChange,
-}: SourceTypeSwitcherProps) {
+export function SourceTypeSwitcher({ value, onChange }: SourceTypeSwitcherProps) {
   return (
-    <Tabs
-      value={value}
-      onValueChange={onChange as (value: string) => void}
-      className="w-full"
-    >
+    <Tabs value={value} onValueChange={onChange as (value: string) => void} className="w-full">
       <TabsList className="grid grid-cols-2 w-full">
         <AnimatePresence mode="wait">
           <motion.div

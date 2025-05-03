@@ -4,21 +4,10 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { InlineAlert } from "@/components/shared/InlineAlert";
 import { motion } from "framer-motion";
-import {
-  FlashcardProposalDTO,
-  CefrLevel,
-  CEFR_LEVEL,
-  FLASHCARD_PROPOSAL_STATUS,
-} from "@/types";
+import { FlashcardProposalDTO, CefrLevel, CEFR_LEVEL, FLASHCARD_PROPOSAL_STATUS } from "@/types";
 import { z } from "zod";
 
 type ProposalCardProps = {
@@ -32,18 +21,8 @@ const editSchema = z.object({
     .string()
     .min(1, "Front content is required")
     .max(200, "Front content must be less than 200 characters"),
-  back_content: z
-    .string()
-    .min(1, "Back content is required")
-    .max(500, "Back content must be less than 500 characters"),
-  cefr_level: z.enum([
-    CEFR_LEVEL.A1,
-    CEFR_LEVEL.A2,
-    CEFR_LEVEL.B1,
-    CEFR_LEVEL.B2,
-    CEFR_LEVEL.C1,
-    CEFR_LEVEL.C2,
-  ]),
+  back_content: z.string().min(1, "Back content is required").max(500, "Back content must be less than 500 characters"),
+  cefr_level: z.enum([CEFR_LEVEL.A1, CEFR_LEVEL.A2, CEFR_LEVEL.B1, CEFR_LEVEL.B2, CEFR_LEVEL.C1, CEFR_LEVEL.C2]),
 });
 
 type EditFormValues = z.infer<typeof editSchema>;
@@ -55,9 +34,7 @@ export function ProposalCard({ proposal, onUpdate }: ProposalCardProps) {
     back_content: proposal.back_content,
     cefr_level: proposal.cefr_level,
   });
-  const [validationErrors, setValidationErrors] = useState<
-    Record<string, string>
-  >({});
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
   // Define available CEFR levels
   const cefrLevels = [
@@ -181,9 +158,7 @@ export function ProposalCard({ proposal, onUpdate }: ProposalCardProps) {
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.3 }}
       className={`p-6 rounded-lg border-2 ${
-        statusBorderColors[
-          proposal.status || FLASHCARD_PROPOSAL_STATUS.ACCEPTED
-        ]
+        statusBorderColors[proposal.status || FLASHCARD_PROPOSAL_STATUS.ACCEPTED]
       } bg-card shadow-sm`}
     >
       <div className="space-y-4">
@@ -192,65 +167,43 @@ export function ProposalCard({ proposal, onUpdate }: ProposalCardProps) {
           <>
             <div className="space-y-2">
               <div className="font-medium text-lg">Front Side</div>
-              <div className="p-3 bg-muted rounded-md">
-                {proposal.front_content}
-              </div>
+              <div className="p-3 bg-muted rounded-md">{proposal.front_content}</div>
             </div>
 
             <div className="space-y-2">
               <div className="font-medium text-lg">Back Side</div>
-              <div className="p-3 bg-muted rounded-md">
-                {proposal.back_content}
-              </div>
+              <div className="p-3 bg-muted rounded-md">{proposal.back_content}</div>
             </div>
           </>
         ) : (
           // Edit Mode
           <>
             <div className="space-y-2">
-              <label
-                htmlFor={`front-${proposal.id}`}
-                className="font-medium text-lg"
-              >
+              <label htmlFor={`front-${proposal.id}`} className="font-medium text-lg">
                 Front Side
               </label>
               <Input
                 id={`front-${proposal.id}`}
                 value={editValues.front_content}
-                onChange={(e) =>
-                  handleEditChange("front_content", e.target.value)
-                }
+                onChange={(e) => handleEditChange("front_content", e.target.value)}
                 placeholder="Enter front side content"
               />
               {validationErrors.front_content && (
-                <InlineAlert
-                  message={validationErrors.front_content}
-                  variant="error"
-                />
+                <InlineAlert message={validationErrors.front_content} variant="error" />
               )}
             </div>
 
             <div className="space-y-2">
-              <label
-                htmlFor={`back-${proposal.id}`}
-                className="font-medium text-lg"
-              >
+              <label htmlFor={`back-${proposal.id}`} className="font-medium text-lg">
                 Back Side
               </label>
               <Textarea
                 id={`back-${proposal.id}`}
                 value={editValues.back_content}
-                onChange={(e) =>
-                  handleEditChange("back_content", e.target.value)
-                }
+                onChange={(e) => handleEditChange("back_content", e.target.value)}
                 placeholder="Enter back side content"
               />
-              {validationErrors.back_content && (
-                <InlineAlert
-                  message={validationErrors.back_content}
-                  variant="error"
-                />
-              )}
+              {validationErrors.back_content && <InlineAlert message={validationErrors.back_content} variant="error" />}
             </div>
           </>
         )}

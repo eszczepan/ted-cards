@@ -21,13 +21,7 @@ export function AnimatedHeading({ children }: { children: ReactNode }) {
 }
 
 // Komponent do animacji kontenerów
-export function AnimatedContainer({
-  children,
-  delay = 0,
-}: {
-  children: ReactNode;
-  delay?: number;
-}) {
+export function AnimatedContainer({ children, delay = 0 }: { children: ReactNode; delay?: number }) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.1 });
 

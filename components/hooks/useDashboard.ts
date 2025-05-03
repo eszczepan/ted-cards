@@ -130,7 +130,7 @@ export function useDashboard() {
 
     const acceptedProposals = state.proposals.filter(
       (proposal) =>
-        proposal.status === FLASHCARD_PROPOSAL_STATUS.ACCEPTED || proposal.status === FLASHCARD_PROPOSAL_STATUS.EDITED
+        proposal.status === FLASHCARD_PROPOSAL_STATUS.ACCEPTED || proposal.status === FLASHCARD_PROPOSAL_STATUS.EDITED,
     );
 
     if (acceptedProposals.length === 0) return;
@@ -187,7 +187,7 @@ export function useDashboard() {
     if (state.saveState === "loading") return;
 
     const nonRejectedProposals = state.proposals.filter(
-      (proposal) => proposal.status !== FLASHCARD_PROPOSAL_STATUS.REJECTED
+      (proposal) => proposal.status !== FLASHCARD_PROPOSAL_STATUS.REJECTED,
     );
 
     if (nonRejectedProposals.length === 0) return;

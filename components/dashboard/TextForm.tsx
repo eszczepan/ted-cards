@@ -12,12 +12,7 @@ type TextFormProps = {
   sourceText: string;
 };
 
-export function TextForm({
-  control,
-  errors,
-  isLoading,
-  sourceText,
-}: TextFormProps) {
+export function TextForm({ control, errors, isLoading, sourceText }: TextFormProps) {
   return (
     <motion.div
       key="text-input"
@@ -45,12 +40,7 @@ export function TextForm({
         )}
       />
       <CharacterCounter currentLength={sourceText.length} maxLength={15000} />
-      {errors.source_text && (
-        <InlineAlert
-          message={String(errors.source_text.message || "")}
-          variant="error"
-        />
-      )}
+      {errors.source_text && <InlineAlert message={String(errors.source_text.message || "")} variant="error" />}
     </motion.div>
   );
 }

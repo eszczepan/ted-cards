@@ -1,12 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import { createClient } from "@/supabase/supabase.server";
-import {
-  FlashcardDTO,
-  FLASHCARD_STATUS,
-  FlashcardStatus,
-  CefrLevel,
-  FlashcardSource,
-} from "@/types";
+import { FlashcardDTO, FLASHCARD_STATUS, FlashcardStatus, CefrLevel, FlashcardSource } from "@/types";
 import type { CreateFlashcardRequest } from "@/app/api/flashcards/schema";
 
 interface DatabaseFlashcard {
@@ -36,7 +30,7 @@ export class FlashcardService {
   async createFlashcards(
     userId: string,
     flashcards: CreateFlashcardRequest[],
-    generationId: string | null = null
+    generationId: string | null = null,
   ): Promise<FlashcardDTO[]> {
     try {
       const supabase = await createClient();
@@ -60,10 +54,7 @@ export class FlashcardService {
       }));
 
       // Insert flashcards in a batch operation
-      const { data, error } = await supabase
-        .from("flashcards")
-        .insert(flashcardRecords)
-        .select();
+      const { data, error } = await supabase.from("flashcards").insert(flashcardRecords).select();
 
       if (error) {
         console.error("Error creating flashcards:", error);
@@ -107,10 +98,7 @@ export class FlashcardService {
    * @param userId User ID for the flashcards
    * @param error The error that occurred
    */
-  private async logFlashcardCreationError(
-    userId: string,
-    error: unknown
-  ): Promise<void> {
+  private async logFlashcardCreationError(userId: string, error: unknown): Promise<void> {
     try {
       const supabase = await createClient();
 

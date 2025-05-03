@@ -26,15 +26,10 @@ export default function PublicLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <header className="w-full fixed top-0 z-50 border-b bg-background/95 backdrop-blur">
           <div className="container max-w-screen-xl mx-auto flex items-center justify-between h-16 px-4 md:px-6">
-            <Link
-              href="/"
-              className="flex items-center gap-2 font-bold text-xl"
-            >
+            <Link href="/" className="flex items-center gap-2 font-bold text-xl">
               <span className="sr-only">TedCards</span>
               TedCards
             </Link>

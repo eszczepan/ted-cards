@@ -15,7 +15,7 @@ export async function POST(request: Request) {
           error: "Invalid request data",
           details: validationResult.error.format(),
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -29,16 +29,13 @@ export async function POST(request: Request) {
 
     try {
       // Generate flashcard proposals
-      const generationResult = await generationService.generateFlashcards(
-        user_id,
-        validatedData
-      );
+      const generationResult = await generationService.generateFlashcards(user_id, validatedData);
 
       // Create generation record in database
       const { id, createdAt } = await generationService.createGenerationRecord(
         user_id,
         validatedData,
-        generationResult
+        generationResult,
       );
 
       // Return response with generated flashcards proposals
@@ -50,7 +47,7 @@ export async function POST(request: Request) {
           generation_duration: generationResult.generationDuration,
           created_at: new Date(createdAt),
         },
-        { status: 201 }
+        { status: 201 },
       );
     } catch (error) {
       console.error("Generation service error:", error);
@@ -59,14 +56,11 @@ export async function POST(request: Request) {
           error: "Failed to generate flashcards",
           message: error instanceof Error ? error.message : "Unknown error",
         },
-        { status: 500 }
+        { status: 500 },
       );
     }
   } catch (error) {
     console.error("Error processing generation request:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

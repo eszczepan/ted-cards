@@ -26,25 +26,16 @@ export default function Dashboard() {
         <section className="w-full flex flex-col items-center mt-6">
           <div className="mb-6 text-center">
             <h2 className="text-2xl font-semibold mb-2">Generate Flashcards</h2>
-            <p className="text-muted-foreground">
-              Generate flashcards from YouTube videos or text input.
-            </p>
+            <p className="text-muted-foreground">Generate flashcards from YouTube videos or text input.</p>
           </div>
 
-          <GenerationForm
-            onSubmit={handleGenerateSubmit}
-            isLoading={isLoading}
-          />
+          <GenerationForm onSubmit={handleGenerateSubmit} isLoading={isLoading} />
         </section>
 
         <section className="w-full px-1">
           <div className="mb-6">
-            <h2 className="text-2xl font-semibold mb-2">
-              Generated Flashcards
-            </h2>
-            <p className="text-muted-foreground">
-              Review, edit, and save your generated flashcards.
-            </p>
+            <h2 className="text-2xl font-semibold mb-2">Generated Flashcards</h2>
+            <p className="text-muted-foreground">Review, edit, and save your generated flashcards.</p>
           </div>
 
           <ProposalList

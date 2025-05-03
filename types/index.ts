@@ -20,16 +20,14 @@ export const FLASHCARD_SOURCE = {
   MANUAL: "manual",
 } as const;
 
-export type FlashcardSource =
-  (typeof FLASHCARD_SOURCE)[keyof typeof FLASHCARD_SOURCE];
+export type FlashcardSource = (typeof FLASHCARD_SOURCE)[keyof typeof FLASHCARD_SOURCE];
 
 export const FLASHCARD_STATUS = {
   ACTIVE: "active",
   INACTIVE: "inactive",
 } as const;
 
-export type FlashcardStatus =
-  (typeof FLASHCARD_STATUS)[keyof typeof FLASHCARD_STATUS];
+export type FlashcardStatus = (typeof FLASHCARD_STATUS)[keyof typeof FLASHCARD_STATUS];
 
 export const SOURCE_TYPE = {
   YOUTUBE: "youtube",
@@ -45,8 +43,7 @@ export const FLASHCARD_PROPOSAL_STATUS = {
   REJECTED: "rejected",
 } as const;
 
-export type FlashcardProposalStatus =
-  (typeof FLASHCARD_PROPOSAL_STATUS)[keyof typeof FLASHCARD_PROPOSAL_STATUS];
+export type FlashcardProposalStatus = (typeof FLASHCARD_PROPOSAL_STATUS)[keyof typeof FLASHCARD_PROPOSAL_STATUS];
 
 /**
  * Bazowe typy encji odzwierciedlające strukturę bazy danych

@@ -17,9 +17,7 @@ export function InlineAlert({ message, variant, onDismiss }: InlineAlertProps) {
   };
 
   return (
-    <Alert
-      className={`${variantClasses[variant]} flex items-center justify-between`}
-    >
+    <Alert className={`${variantClasses[variant]} flex items-center justify-between`}>
       <AlertDescription>{message}</AlertDescription>
       {onDismiss && (
         <button

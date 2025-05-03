@@ -4,12 +4,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { motion } from "framer-motion";
-import {
-  AnimatedHeading,
-  AnimatedContainer,
-  AnimatedCards,
-  AnimatedCard,
-} from "@/components/animations/landing-page";
+import { AnimatedHeading, AnimatedContainer, AnimatedCards, AnimatedCard } from "@/components/animations/landing-page";
 
 export default function Home() {
   return (
@@ -24,9 +19,8 @@ export default function Home() {
                     Your AI-Powered Flashcard Generator
                   </h1>
                   <p className="max-w-[600px] text-gray-500 md:text-xl dark:text-gray-400">
-                    Capture, store, and leverage knowledge that grows with you.
-                    Transform YouTube videos into high-quality flashcards for
-                    effective learning in seconds.
+                    Capture, store, and leverage knowledge that grows with you. Transform YouTube videos into
+                    high-quality flashcards for effective learning in seconds.
                   </p>
                 </div>
                 <motion.div
@@ -125,9 +119,7 @@ export default function Home() {
           <AnimatedHeading>
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
-                <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
-                  Powerful AI Tools
-                </h2>
+                <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">Powerful AI Tools</h2>
                 <div className="h-1 w-24 bg-blue-600 mx-auto my-4"></div>
               </div>
             </div>
@@ -155,13 +147,10 @@ export default function Home() {
                         <path d="M10 9l5 3l-5 3z"></path>
                       </svg>
                     </div>
-                    <h3 className="text-xl font-bold mt-4 text-center">
-                      YouTube to Flashcards
-                    </h3>
+                    <h3 className="text-xl font-bold mt-4 text-center">YouTube to Flashcards</h3>
                     <p className="text-gray-500 flex-grow mt-2">
-                      Automatically generate flashcards from YouTube videos. Our
-                      AI extracts key concepts and creates high-quality learning
-                      materials with examples.
+                      Automatically generate flashcards from YouTube videos. Our AI extracts key concepts and creates
+                      high-quality learning materials with examples.
                     </p>
                     <Link href="/signup" className="mt-4">
                       <Button variant="outline" className="w-full">
@@ -194,13 +183,10 @@ export default function Home() {
                         <path d="M8 4v16"></path>
                       </svg>
                     </div>
-                    <h3 className="text-xl font-bold mt-4 text-center">
-                      Text to Flashcards
-                    </h3>
+                    <h3 className="text-xl font-bold mt-4 text-center">Text to Flashcards</h3>
                     <p className="text-gray-500 flex-grow mt-2">
-                      Paste any text and let our AI transform it into flashcards
-                      with examples. Ideal for articles, notes, or lecture
-                      transcripts.
+                      Paste any text and let our AI transform it into flashcards with examples. Ideal for articles,
+                      notes, or lecture transcripts.
                     </p>
                     <Link href="/signup" className="mt-4">
                       <Button variant="outline" className="w-full">
@@ -234,13 +220,10 @@ export default function Home() {
                         <path d="M15 8h6"></path>
                       </svg>
                     </div>
-                    <h3 className="text-xl font-bold mt-4 text-center">
-                      CEFR Level Assessment
-                    </h3>
+                    <h3 className="text-xl font-bold mt-4 text-center">CEFR Level Assessment</h3>
                     <p className="text-gray-500 flex-grow mt-2">
-                      Each flashcard is automatically assigned a CEFR language
-                      proficiency level (A1-C2), helping you focus on content
-                      that matches your learning stage.
+                      Each flashcard is automatically assigned a CEFR language proficiency level (A1-C2), helping you
+                      focus on content that matches your learning stage.
                     </p>
                     <Link href="/signup" className="mt-4">
                       <Button variant="outline" className="w-full">
@@ -260,13 +243,10 @@ export default function Home() {
           <AnimatedHeading>
             <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
               <div className="space-y-2">
-                <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
-                  How TedCards Works
-                </h2>
+                <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">How TedCards Works</h2>
                 <div className="h-1 w-24 bg-blue-600 mx-auto my-4"></div>
                 <p className="max-w-[800px] text-gray-500 md:text-xl dark:text-gray-400">
-                  From discovering content to effective learning, TedCards makes
-                  building your knowledge effortless
+                  From discovering content to effective learning, TedCards makes building your knowledge effortless
                 </p>
               </div>
             </div>
@@ -295,9 +275,7 @@ export default function Home() {
                     </svg>
                   </div>
                   <h3 className="text-xl font-bold z-[1]">Discover</h3>
-                  <p className="text-gray-500 z-[1]">
-                    Find valuable content across YouTube
-                  </p>
+                  <p className="text-gray-500 z-[1]">Find valuable content across YouTube</p>
                   <div className="absolute w-full h-48 mt-4 bg-blue-50 rounded-lg flex items-center justify-center overflow-hidden">
                     <div className="absolute inset-0 w-full h-full">
                       <div className="absolute w-[95%] h-4/5 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg transform -rotate-6"></div>
@@ -329,9 +307,7 @@ export default function Home() {
                     </svg>
                   </div>
                   <h3 className="text-xl font-bold z-[1]">Capture</h3>
-                  <p className="text-gray-500 z-[1]">
-                    Save insights to your AI flashcards with a click
-                  </p>
+                  <p className="text-gray-500 z-[1]">Save insights to your AI flashcards with a click</p>
                   <div className="absolute w-full h-48 mt-4 bg-purple-50 rounded-lg flex items-center justify-center overflow-hidden">
                     <div className="absolute inset-0 w-full h-full">
                       <div className="absolute w-[95%] h-4/5 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gradient-to-br from-purple-100 to-purple-200 rounded-lg transform rotate-3"></div>
@@ -363,9 +339,7 @@ export default function Home() {
                     </svg>
                   </div>
                   <h3 className="text-xl font-bold z-[1]">Organize</h3>
-                  <p className="text-gray-500 z-[1]">
-                    Sort knowledge into custom libraries
-                  </p>
+                  <p className="text-gray-500 z-[1]">Sort knowledge into custom libraries</p>
                   <div className="absolute w-full h-48 mt-4 bg-green-50 rounded-lg flex items-center justify-center overflow-hidden">
                     <div className="absolute inset-0 w-full h-full">
                       <div className="absolute w-[95%] h-4/5 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gradient-to-br from-green-100 to-green-200 rounded-lg transform -rotate-3"></div>
@@ -398,9 +372,7 @@ export default function Home() {
                     </svg>
                   </div>
                   <h3 className="text-xl font-bold z-[1]">Access</h3>
-                  <p className="text-gray-500 z-[1]">
-                    Chat with your knowledge base anytime
-                  </p>
+                  <p className="text-gray-500 z-[1]">Chat with your knowledge base anytime</p>
                   <div className="absolute w-full h-48 mt-4 bg-pink-50 rounded-lg flex items-center justify-center overflow-hidden">
                     <div className="absolute inset-0 w-full h-full">
                       <div className="absolute w-[95%] h-4/5 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gradient-to-br from-pink-100 to-pink-200 rounded-lg transform rotate-6"></div>
@@ -432,10 +404,7 @@ export default function Home() {
                     </svg>
                   </div>
                   <h3 className="text-xl font-bold z-[1]">Create</h3>
-                  <p className="text-gray-500 z-[1]">
-                    Transform your knowledge into flashcards for effective
-                    learning
-                  </p>
+                  <p className="text-gray-500 z-[1]">Transform your knowledge into flashcards for effective learning</p>
                   <div className="absolute w-full h-48 mt-4 bg-amber-50 rounded-lg flex items-center justify-center overflow-hidden">
                     <div className="absolute inset-0 w-full h-full">
                       <div className="absolute w-[95%] h-4/5 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gradient-to-br from-amber-100 to-amber-200 rounded-lg transform -rotate-6"></div>
@@ -467,8 +436,7 @@ export default function Home() {
                   </div>
                   <h3 className="text-xl font-bold z-[1]">Share</h3>
                   <p className="text-gray-500 z-[1]">
-                    Exchange knowledge libraries with others who share your
-                    interests
+                    Exchange knowledge libraries with others who share your interests
                   </p>
                   <div className="absolute w-full h-48 mt-4 bg-cyan-50 rounded-lg flex items-center justify-center overflow-hidden">
                     <div className="absolute inset-0 w-full h-full">
@@ -488,13 +456,10 @@ export default function Home() {
           <AnimatedHeading>
             <div className="flex flex-col items-center justify-center space-y-4 text-center mb-16">
               <div className="space-y-2">
-                <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
-                  Who Is TedCards For?
-                </h2>
+                <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">Who Is TedCards For?</h2>
                 <div className="h-1 w-24 bg-blue-600 mx-auto my-4"></div>
                 <p className="max-w-[800px] text-gray-500 md:text-xl dark:text-gray-400">
-                  TedCards adapts to your unique learning style no matter who
-                  you are
+                  TedCards adapts to your unique learning style no matter who you are
                 </p>
               </div>
             </div>
@@ -563,9 +528,7 @@ export default function Home() {
                         <polyline points="20 6 9 17 4 12"></polyline>
                       </svg>
                       <p className="text-gray-700">
-                        <span className="font-semibold">
-                          Prepare effectively{" "}
-                        </span>
+                        <span className="font-semibold">Prepare effectively </span>
                         for exams with personalized study materials
                       </p>
                     </li>
@@ -585,11 +548,8 @@ export default function Home() {
                         <polyline points="20 6 9 17 4 12"></polyline>
                       </svg>
                       <p className="text-gray-700">
-                        <span className="font-semibold">
-                          Master difficult concepts{" "}
-                        </span>
-                        with AI-generated examples that match your learning
-                        style
+                        <span className="font-semibold">Master difficult concepts </span>
+                        with AI-generated examples that match your learning style
                       </p>
                     </li>
                   </ul>
@@ -636,9 +596,7 @@ export default function Home() {
                         <polyline points="20 6 9 17 4 12"></polyline>
                       </svg>
                       <p className="text-gray-700">
-                        <span className="font-semibold">
-                          Generate materials{" "}
-                        </span>
+                        <span className="font-semibold">Generate materials </span>
                         for your class in minutes instead of hours
                       </p>
                     </li>
@@ -658,9 +616,7 @@ export default function Home() {
                         <polyline points="20 6 9 17 4 12"></polyline>
                       </svg>
                       <p className="text-gray-700">
-                        <span className="font-semibold">
-                          Share flashcard collections{" "}
-                        </span>
+                        <span className="font-semibold">Share flashcard collections </span>
                         directly with students and colleagues
                       </p>
                     </li>
@@ -680,9 +636,7 @@ export default function Home() {
                         <polyline points="20 6 9 17 4 12"></polyline>
                       </svg>
                       <p className="text-gray-700">
-                        <span className="font-semibold">
-                          Customize difficulty levels{" "}
-                        </span>
+                        <span className="font-semibold">Customize difficulty levels </span>
                         to match different student proficiency levels
                       </p>
                     </li>
@@ -739,9 +693,7 @@ export default function Home() {
                         <polyline points="20 6 9 17 4 12"></polyline>
                       </svg>
                       <p className="text-gray-700">
-                        <span className="font-semibold">
-                          Build a personal knowledge library{" "}
-                        </span>
+                        <span className="font-semibold">Build a personal knowledge library </span>
                         that grows and evolves with your interests
                       </p>
                     </li>
@@ -781,11 +733,8 @@ export default function Home() {
                         <polyline points="20 6 9 17 4 12"></polyline>
                       </svg>
                       <p className="text-gray-700">
-                        <span className="font-semibold">
-                          Learn efficiently{" "}
-                        </span>
-                        by capturing insights from educational content in any
-                        format
+                        <span className="font-semibold">Learn efficiently </span>
+                        by capturing insights from educational content in any format
                       </p>
                     </li>
                   </ul>
@@ -834,9 +783,7 @@ export default function Home() {
                         <polyline points="20 6 9 17 4 12"></polyline>
                       </svg>
                       <p className="text-gray-700">
-                        <span className="font-semibold">
-                          Learn essential phrases{" "}
-                        </span>
+                        <span className="font-semibold">Learn essential phrases </span>
                         tailored to your destination before you travel
                       </p>
                     </li>
@@ -856,9 +803,7 @@ export default function Home() {
                         <polyline points="20 6 9 17 4 12"></polyline>
                       </svg>
                       <p className="text-gray-700">
-                        <span className="font-semibold">
-                          Create custom flashcards{" "}
-                        </span>
+                        <span className="font-semibold">Create custom flashcards </span>
                         for cultural insights and local customs
                       </p>
                     </li>
@@ -900,14 +845,11 @@ export default function Home() {
                     Ready to 10X your Knowledge?
                   </h2>
                   <p className="text-lg text-blue-600 md:text-xl mb-8">
-                    Join thousands of knowledge enthusiasts already using
-                    TedCards to enhance their learning and productivity.
+                    Join thousands of knowledge enthusiasts already using TedCards to enhance their learning and
+                    productivity.
                   </p>
                   <Link href="/signup">
-                    <Button
-                      size="lg"
-                      className="bg-blue-600 text-white hover:bg-blue-700"
-                    >
+                    <Button size="lg" className="bg-blue-600 text-white hover:bg-blue-700">
                       Try TedCards Free
                     </Button>
                   </Link>
@@ -922,9 +864,7 @@ export default function Home() {
         <div className="container max-w-screen-xl mx-auto px-4 md:px-6">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div>
-              <p className="text-gray-500">
-                &copy; 2024 TedCards. All rights reserved.
-              </p>
+              <p className="text-gray-500">&copy; 2024 TedCards. All rights reserved.</p>
             </div>
             <div className="flex gap-4 mt-4 md:mt-0">
               <Link href="#" className="text-gray-500 hover:text-gray-700">

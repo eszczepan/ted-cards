@@ -21,10 +21,7 @@ export class GenerationService {
    * @param params Generation parameters
    * @returns Generated flashcard proposals and metadata
    */
-  async generateFlashcards(
-    userId: string,
-    params: CreateGenerationCommand
-  ): Promise<GenerateFlashcardsResult> {
+  async generateFlashcards(userId: string, params: CreateGenerationCommand): Promise<GenerateFlashcardsResult> {
     const startTime = Date.now();
 
     try {
@@ -56,7 +53,7 @@ export class GenerationService {
   async createGenerationRecord(
     userId: string,
     params: CreateGenerationCommand,
-    result: GenerateFlashcardsResult
+    result: GenerateFlashcardsResult,
   ): Promise<{ id: string; createdAt: string }> {
     const supabase = await createClient();
 
@@ -94,11 +91,7 @@ export class GenerationService {
    * @param params Generation parameters
    * @param error The error that occurred
    */
-  private async logGenerationError(
-    userId: string,
-    params: CreateGenerationCommand,
-    error: unknown
-  ): Promise<void> {
+  private async logGenerationError(userId: string, params: CreateGenerationCommand, error: unknown): Promise<void> {
     try {
       const supabase = await createClient();
       const sourceTextHash = this.generateMD5Hash(params.source_text);
@@ -135,15 +128,11 @@ export class GenerationService {
    * @param params Generation parameters
    * @returns Array of mock flashcard proposals
    */
-  private createMockProposals(
-    params: CreateGenerationCommand
-  ): FlashcardProposalDTO[] {
+  private createMockProposals(params: CreateGenerationCommand): FlashcardProposalDTO[] {
     const { source_type, front_language, back_language } = params;
 
     const source =
-      source_type === SOURCE_TYPE.YOUTUBE
-        ? FLASHCARD_SOURCE.AI_YOUTUBE_FULL
-        : FLASHCARD_SOURCE.AI_TEXT_FULL;
+      source_type === SOURCE_TYPE.YOUTUBE ? FLASHCARD_SOURCE.AI_YOUTUBE_FULL : FLASHCARD_SOURCE.AI_TEXT_FULL;
 
     // Create more realistic mock data based on source type
     if (source_type === SOURCE_TYPE.YOUTUBE) {

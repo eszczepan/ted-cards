@@ -26,15 +26,11 @@ export function ProposalList({
 }: ProposalListProps) {
   // Count accepted/edited proposals
   const acceptedCount = proposals.filter(
-    (p) =>
-      p.status === FLASHCARD_PROPOSAL_STATUS.ACCEPTED ||
-      p.status === FLASHCARD_PROPOSAL_STATUS.EDITED
+    (p) => p.status === FLASHCARD_PROPOSAL_STATUS.ACCEPTED || p.status === FLASHCARD_PROPOSAL_STATUS.EDITED,
   ).length;
 
   // Count non-rejected proposals
-  const nonRejectedCount = proposals.filter(
-    (p) => p.status !== FLASHCARD_PROPOSAL_STATUS.REJECTED
-  ).length;
+  const nonRejectedCount = proposals.filter((p) => p.status !== FLASHCARD_PROPOSAL_STATUS.REJECTED).length;
 
   if (isLoading) {
     return <SkeletonLoader count={3} height={200} />;
@@ -45,12 +41,7 @@ export function ProposalList({
   }
 
   if (proposals.length === 0) {
-    return (
-      <InlineAlert
-        message="No flashcards generated yet. Try submitting the form above."
-        variant="info"
-      />
-    );
+    return <InlineAlert message="No flashcards generated yet. Try submitting the form above." variant="info" />;
   }
 
   return (
@@ -58,24 +49,17 @@ export function ProposalList({
       <div className="flex flex-wrap justify-between items-center gap-4">
         <div>
           <p className="text-sm text-muted-foreground">
-            {proposals.length} flashcards generated • {acceptedCount}{" "}
-            accepted/edited • {proposals.length - nonRejectedCount} rejected
+            {proposals.length} flashcards generated • {acceptedCount} accepted/edited •{" "}
+            {proposals.length - nonRejectedCount} rejected
           </p>
         </div>
 
         <div className="flex flex-wrap gap-3">
-          <Button
-            variant="outline"
-            onClick={onSaveAll}
-            disabled={isSaving || nonRejectedCount === 0}
-          >
+          <Button variant="outline" onClick={onSaveAll} disabled={isSaving || nonRejectedCount === 0}>
             {isSaving ? "Saving..." : `Save All (${nonRejectedCount})`}
           </Button>
 
-          <Button
-            onClick={onSaveAccepted}
-            disabled={isSaving || acceptedCount === 0}
-          >
+          <Button onClick={onSaveAccepted} disabled={isSaving || acceptedCount === 0}>
             {isSaving ? "Saving..." : `Save Accepted (${acceptedCount})`}
           </Button>
         </div>
