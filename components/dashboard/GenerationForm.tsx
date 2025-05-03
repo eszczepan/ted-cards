@@ -6,7 +6,7 @@ import { CreateGenerationCommand, SourceType, SOURCE_TYPE } from "@/types";
 import { AnimatePresence } from "framer-motion";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import { createGenerationSchema } from "@/app/api/generations/schema";
 import { YouTubeForm } from "./YouTubeForm";
 import { TextForm } from "./TextForm";
 
@@ -17,48 +17,6 @@ export type GenerationFormBase = {
   source_youtube_url: string;
   source_text: string;
 };
-
-export type YouTubeFormType = {
-  source_type: typeof SOURCE_TYPE.YOUTUBE;
-  front_language: string;
-  back_language: string;
-  source_youtube_url: string;
-  source_text?: string;
-};
-
-export type TextFormType = {
-  source_type: typeof SOURCE_TYPE.TEXT;
-  front_language: string;
-  back_language: string;
-  source_text: string;
-  source_youtube_url?: string;
-};
-
-export type FormValues = YouTubeFormType | TextFormType;
-
-const youtubeUrlSchema = z.string().url("Please enter a valid YouTube URL").min(1, "YouTube URL is required");
-
-const sourceTextSchema = z.string().min(1, "Source text is required").max(15000, "Text cannot exceed 15000 characters");
-
-const commonFieldsSchema = z.object({
-  source_type: z.enum([SOURCE_TYPE.YOUTUBE, SOURCE_TYPE.TEXT]),
-  front_language: z.string().min(1, "Front language is required"),
-  back_language: z.string().min(1, "Back language is required"),
-});
-
-const youtubeSchema = commonFieldsSchema.extend({
-  source_type: z.literal(SOURCE_TYPE.YOUTUBE),
-  source_youtube_url: youtubeUrlSchema,
-  source_text: z.string().optional(),
-});
-
-const textSchema = commonFieldsSchema.extend({
-  source_type: z.literal(SOURCE_TYPE.TEXT),
-  source_text: sourceTextSchema,
-  source_youtube_url: z.string().optional(),
-});
-
-const formSchema = z.discriminatedUnion("source_type", [youtubeSchema, textSchema]);
 
 type GenerationFormProps = {
   onSubmit: (data: CreateGenerationCommand) => void;
@@ -78,7 +36,11 @@ export function GenerationForm({ onSubmit, isLoading }: GenerationFormProps) {
     formState: { errors },
     setValue,
   } = useForm<GenerationFormBase>({
-    resolver: zodResolver(formSchema) as unknown as never,
+    // NOTE: Using type assertion here due to the complexity of the discriminated union schema
+    // with react-hook-form. This is a known limitation when using discriminated unions with
+    // react-hook-form and zodResolver. The validation itself works correctly, but the type
+    // system cannot properly infer the relationship between the schema and the form type.
+    resolver: zodResolver(createGenerationSchema) as unknown as never,
     defaultValues: {
       source_type: SOURCE_TYPE.YOUTUBE,
       front_language: "en",

@@ -26,7 +26,6 @@ export const createGenerationSchema = z.discriminatedUnion("source_type", [
   textGenerationSchema,
 ]);
 
-// Schemas for response validation
 export const flashcardProposalSchema = z.object({
   id: z.string().uuid(),
   front_content: z.string(),

@@ -37,10 +37,7 @@ export function YouTubeForm({ control, errors, isLoading }: YouTubeFormProps) {
         )}
       />
       {errors.source_youtube_url && (
-        <InlineAlert
-          message={String(errors.source_youtube_url.message || "")}
-          variant="error"
-        />
+        <InlineAlert message={String(errors.source_youtube_url.message || "")} variant="error" />
       )}
     </motion.div>
   );
