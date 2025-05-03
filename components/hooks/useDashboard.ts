@@ -97,16 +97,10 @@ export function useDashboard() {
 
       const responseData = await response.json();
 
-      // Set all proposals to ACCEPTED by default
-      const proposalsWithDefaultStatus = responseData.flashcard_proposals.map((proposal: FlashcardProposalDTO) => ({
-        ...proposal,
-        status: FLASHCARD_PROPOSAL_STATUS.ACCEPTED,
-      }));
-
       setState((prev) => ({
         ...prev,
         generationState: "success",
-        proposals: proposalsWithDefaultStatus,
+        proposals: responseData.flashcard_proposals,
         generationId: responseData.id,
       }));
     } catch (error) {
@@ -130,7 +124,7 @@ export function useDashboard() {
 
     const acceptedProposals = state.proposals.filter(
       (proposal) =>
-        proposal.status === FLASHCARD_PROPOSAL_STATUS.ACCEPTED || proposal.status === FLASHCARD_PROPOSAL_STATUS.EDITED,
+        proposal.status === FLASHCARD_PROPOSAL_STATUS.ACCEPTED || proposal.status === FLASHCARD_PROPOSAL_STATUS.EDITED
     );
 
     if (acceptedProposals.length === 0) return;
@@ -186,11 +180,7 @@ export function useDashboard() {
   async function handleSaveAll() {
     if (state.saveState === "loading") return;
 
-    const nonRejectedProposals = state.proposals.filter(
-      (proposal) => proposal.status !== FLASHCARD_PROPOSAL_STATUS.REJECTED,
-    );
-
-    if (nonRejectedProposals.length === 0) return;
+    if (state.proposals.length === 0) return;
 
     setState((prev) => ({
       ...prev,
@@ -199,7 +189,7 @@ export function useDashboard() {
     }));
 
     try {
-      const flashcardsToSave: CreateFlashcardDTO[] = nonRejectedProposals.map((proposal) => ({
+      const flashcardsToSave: CreateFlashcardDTO[] = state.proposals.map((proposal) => ({
         front_content: proposal.front_content,
         back_content: proposal.back_content,
         front_language: proposal.front_language,

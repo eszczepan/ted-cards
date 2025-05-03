@@ -242,7 +242,8 @@ export function ProposalCard({ proposal, onUpdate }: ProposalCardProps) {
             ) : (
               // View Mode Actions
               <>
-                {proposal.status === FLASHCARD_PROPOSAL_STATUS.REJECTED && (
+                {(proposal.status === FLASHCARD_PROPOSAL_STATUS.REJECTED ||
+                  proposal.status === FLASHCARD_PROPOSAL_STATUS.PENDING) && (
                   <Button onClick={handleAccept} variant="default">
                     Accept
                   </Button>
@@ -251,7 +252,7 @@ export function ProposalCard({ proposal, onUpdate }: ProposalCardProps) {
                   Edit
                 </Button>
                 {proposal.status !== FLASHCARD_PROPOSAL_STATUS.REJECTED && (
-                  <Button onClick={handleReject} variant="destructive">
+                  <Button onClick={handleReject} variant="outline" className="text-red-500">
                     Reject
                   </Button>
                 )}

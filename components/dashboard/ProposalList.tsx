@@ -26,11 +26,10 @@ export function ProposalList({
 }: ProposalListProps) {
   // Count accepted/edited proposals
   const acceptedCount = proposals.filter(
-    (p) => p.status === FLASHCARD_PROPOSAL_STATUS.ACCEPTED || p.status === FLASHCARD_PROPOSAL_STATUS.EDITED,
+    (p) => p.status === FLASHCARD_PROPOSAL_STATUS.ACCEPTED || p.status === FLASHCARD_PROPOSAL_STATUS.EDITED
   ).length;
 
-  // Count non-rejected proposals
-  const nonRejectedCount = proposals.filter((p) => p.status !== FLASHCARD_PROPOSAL_STATUS.REJECTED).length;
+  const totalCount = proposals.length;
 
   if (isLoading) {
     return <SkeletonLoader count={3} height={200} />;
@@ -49,14 +48,14 @@ export function ProposalList({
       <div className="flex flex-wrap justify-between items-center gap-4">
         <div>
           <p className="text-sm text-muted-foreground">
-            {proposals.length} flashcards generated • {acceptedCount} accepted/edited •{" "}
-            {proposals.length - nonRejectedCount} rejected
+            {totalCount} flashcards generated • {acceptedCount} accepted/edited •{" "}
+            {proposals.filter((p) => p.status === FLASHCARD_PROPOSAL_STATUS.REJECTED).length} rejected
           </p>
         </div>
 
         <div className="flex flex-wrap gap-3">
-          <Button variant="outline" onClick={onSaveAll} disabled={isSaving || nonRejectedCount === 0}>
-            {isSaving ? "Saving..." : `Save All (${nonRejectedCount})`}
+          <Button variant="outline" onClick={onSaveAll} disabled={isSaving || totalCount === 0}>
+            {isSaving ? "Saving..." : `Save All (${totalCount})`}
           </Button>
 
           <Button onClick={onSaveAccepted} disabled={isSaving || acceptedCount === 0}>
