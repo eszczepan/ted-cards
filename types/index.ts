@@ -1,6 +1,3 @@
-/**
- * Stałe wartości używane w aplikacji
- */
 export const CEFR_LEVEL = {
   A1: "A1",
   A2: "A2",
@@ -45,9 +42,6 @@ export const FLASHCARD_PROPOSAL_STATUS = {
 
 export type FlashcardProposalStatus = (typeof FLASHCARD_PROPOSAL_STATUS)[keyof typeof FLASHCARD_PROPOSAL_STATUS];
 
-/**
- * Bazowe typy encji odzwierciedlające strukturę bazy danych
- */
 export interface User {
   id: string; // UUID
   email: string;
@@ -220,6 +214,8 @@ export interface CreateGenerationCommand {
   source_youtube_url?: string; // wymagane jeśli source_type to youtube
   front_language: string;
   back_language: string;
+  cefr_level?: CefrLevel;
+  count?: number;
 }
 
 // Odpowiedź po rozpoczęciu procesu generacji
