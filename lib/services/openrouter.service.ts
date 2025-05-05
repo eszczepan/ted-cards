@@ -37,7 +37,6 @@ export class OpenRouterService {
   private timeout = 60000;
   private maxRetries = 3;
   private retryDelay = 1000;
-  private logger = console;
 
   constructor(config: OpenRouterServiceConfig) {
     this.validateInitConfig(config);
@@ -173,12 +172,12 @@ export class OpenRouterService {
           error instanceof ValidationError ||
           error instanceof ContextLimitError
         ) {
-          this.logError(lastError, metadata);
+          console.log(lastError, metadata);
           throw error;
         }
 
         if (error instanceof RateLimitError && modelTier === "premium") {
-          this.logger.warn(`Rate limited on premium model, trying balanced model instead`);
+          console.warn(`Rate limited on premium model, trying balanced model instead`);
           try {
             return await this.makeRequest(prompt, parameters, responseFormat, metadata, "balanced");
           } catch {}
@@ -189,7 +188,17 @@ export class OpenRouterService {
           await sleep(delayWithJitter);
           attempt += 1;
         } else {
-          this.logError(lastError, metadata);
+          const duration = Date.now() - metadata.startTime;
+
+          console.error({
+            type: lastError.name,
+            message: lastError.message,
+            timestamp: new Date().toISOString(),
+            userId: metadata.userId || "unknown",
+            requestId: metadata.requestId,
+            model: this.defaultModelTier,
+            duration,
+          });
           throw lastError;
         }
       }
@@ -207,10 +216,8 @@ export class OpenRouterService {
   ): Promise<OpenRouterResponse> {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), this.timeout);
-
     const modelConfig = this.getModelConfig(modelTier);
     const modelId = modelConfig.modelId;
-
     const sanitizedPrompt = sanitizeText(prompt);
 
     try {
@@ -240,6 +247,7 @@ export class OpenRouterService {
 
       if (!response.ok) {
         const errorText = await response.text();
+
         if (response.status === 401) {
           throw new AuthenticationError(`Authentication failed: ${errorText}`);
         } else if (response.status === 429) {
@@ -308,37 +316,5 @@ export class OpenRouterService {
     if (!config.apiKey) {
       throw new AuthenticationError("API key is required");
     }
-  }
-
-  private logSuccess(metadata: RequestMetadata, data: OpenRouterResponse, flashcardCount: number): void {
-    const duration = Date.now() - metadata.startTime;
-    this.logger.info({
-      type: "FlashcardsGenerated",
-      timestamp: new Date().toISOString(),
-      userId: metadata.userId,
-      requestId: metadata.requestId,
-      model: data.model,
-      duration,
-      tokenCount: {
-        prompt: data.usage.prompt_tokens,
-        completion: data.usage.completion_tokens,
-        total: data.usage.total_tokens,
-      },
-      flashcardCount,
-    });
-  }
-
-  private logError(error: Error, metadata: RequestMetadata): void {
-    const duration = Date.now() - metadata.startTime;
-
-    this.logger.error({
-      type: error.name,
-      message: error.message,
-      timestamp: new Date().toISOString(),
-      userId: metadata.userId || "unknown",
-      requestId: metadata.requestId,
-      model: this.defaultModelTier,
-      duration,
-    });
   }
 }
