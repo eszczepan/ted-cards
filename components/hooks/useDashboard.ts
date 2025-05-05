@@ -72,28 +72,13 @@ export function useDashboard() {
     }));
 
     try {
-      const requestData = { ...data };
-
-      if (data.source_type === SOURCE_TYPE.YOUTUBE) {
-        // When using YouTube source, ensure source_text is valid but empty
-        requestData.source_text = requestData.source_text || "";
-      } else if (data.source_type === SOURCE_TYPE.TEXT) {
-        // When using Text source, ensure source_youtube_url is empty
-        requestData.source_youtube_url = "";
-      }
-
       const response = await fetch("/api/generations", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(requestData),
+        body: JSON.stringify(data),
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || errorData.details?._errors?.[0] || "Failed to generate flashcards");
-      }
 
       const responseData = await response.json();
 
@@ -166,6 +151,7 @@ export function useDashboard() {
 
       setState((prev) => ({
         ...prev,
+        proposals: prev.proposals.filter((proposal) => !acceptedProposals.includes(proposal)),
         saveState: "success",
       }));
     } catch (error) {
@@ -219,6 +205,7 @@ export function useDashboard() {
 
       setState((prev) => ({
         ...prev,
+        proposals: [],
         saveState: "success",
       }));
     } catch (error) {
