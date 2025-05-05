@@ -4,7 +4,6 @@ import {
   ResponseFormat,
   OpenRouterServiceConfig,
   OpenRouterResponse,
-  FlashcardGenerationResponse,
   SupportedModel,
   RequestMetadata,
 } from "@/types/openrouter";
@@ -16,21 +15,9 @@ import {
   RateLimitError,
   ContextLimitError,
 } from "./openrouter.error";
-import {
-  FlashcardProposalDTO,
-  CefrLevel,
-  FLASHCARD_PROPOSAL_STATUS,
-  CreateGenerationCommand,
-  SOURCE_TYPE,
-  FlashcardProposalStatus,
-  FlashcardSource,
-} from "@/types";
-import { v4 as uuidv4 } from "uuid";
-import { estimateTokenCount } from "../utils/token-counter";
 import { sanitizeText } from "../utils/sanitize-text";
 import { sleep } from "../utils";
-import { openRouterConfigSchema, DEFAULT_FLASHCARD_SCHEMA, knownErrors, MODEL_CONFIGS } from "../utils/openrouter";
-import { generateFlashcardsPrompt } from "../prompts/prompts";
+import { openRouterConfigSchema, MODEL_CONFIGS } from "../utils/openrouter";
 
 export class OpenRouterService {
   private apiKey: string;
@@ -46,94 +33,7 @@ export class OpenRouterService {
     this.defaultModelTier = config.defaultModel || "balanced";
   }
 
-  async generateFlashcards(
-    userId: string,
-    options: CreateGenerationCommand
-  ): Promise<{
-    generationId: string;
-    generationDuration: number;
-    proposals: FlashcardProposalDTO[];
-    modelAI: string;
-    createdAt: string;
-  }> {
-    const { source_text, front_language, back_language, cefr_level } = options;
-    const generationId = uuidv4();
-    const startTime = Date.now();
-    const textLength = source_text.length;
-
-    if (!source_text) {
-      throw new ValidationError("Source text is required");
-    }
-
-    if (!front_language || !back_language) {
-      throw new ValidationError("Front and back languages are required");
-    }
-
-    const estimatedTokens = estimateTokenCount(source_text);
-    const modelTier = this.selectModelTier({
-      textLength,
-      complexity: cefr_level && ["C1", "C2"].includes(cefr_level) ? "high" : "medium",
-      priority: textLength > 5000 ? "quality" : "cost",
-    });
-    const modelConfig = this.getModelConfig(modelTier);
-
-    if (estimatedTokens > modelConfig.contextLimit) {
-      throw new ContextLimitError(estimatedTokens);
-    }
-
-    const parameters = { ...modelConfig.defaultParams };
-    const prompt = generateFlashcardsPrompt(options);
-    const metadata: RequestMetadata = {
-      userId,
-      requestId: generationId,
-      startTime,
-    };
-
-    try {
-      const { model, content } = await this.makeRequestWithRetry<FlashcardGenerationResponse>(
-        prompt,
-        parameters,
-        DEFAULT_FLASHCARD_SCHEMA,
-        metadata,
-        modelTier
-      );
-
-      if (!content || !Array.isArray(content.flashcards)) {
-        throw new ParsingError("Invalid flashcard generation response format");
-      }
-
-      const source = options.source_type === SOURCE_TYPE.YOUTUBE ? "ai_youtube_full" : "ai_text_full";
-
-      const proposals = content.flashcards.map((card) => ({
-        id: uuidv4(),
-        front_content: card.front_content,
-        back_content: card.back_content,
-        front_language: options.front_language,
-        back_language: options.back_language,
-        cefr_level: card.cefr_level as CefrLevel,
-        source: source as FlashcardSource,
-        status: FLASHCARD_PROPOSAL_STATUS.PENDING as FlashcardProposalStatus,
-      }));
-
-      return {
-        generationId,
-        generationDuration: Date.now() - startTime,
-        proposals,
-        modelAI: model,
-        createdAt: new Date().toISOString(),
-      };
-    } catch (error) {
-      if (error instanceof Error && knownErrors.some((errorType) => error instanceof errorType)) {
-        throw error;
-      }
-
-      throw new ParsingError(
-        `Failed to generate flashcards: ${error instanceof Error ? error.message : "Unknown error"}`
-      );
-    }
-  }
-
-  private selectModelTier(options: {
+  public selectModelTier(options: {
     textLength: number;
     complexity?: "low" | "medium" | "high";
     priority?: "speed" | "quality" | "cost";
@@ -157,12 +57,12 @@ export class OpenRouterService {
     }
   }
 
-  private getModelConfig(tier?: SupportedModel): (typeof MODEL_CONFIGS)[SupportedModel] {
+  public getModelConfig(tier?: SupportedModel): (typeof MODEL_CONFIGS)[SupportedModel] {
     const modelTier = tier || this.defaultModelTier;
     return MODEL_CONFIGS[modelTier];
   }
 
-  private async makeRequestWithRetry<T>(
+  public async makeRequestWithRetry<T>(
     prompt: string,
     parameters: ModelParameters,
     responseFormat: ResponseFormat,
@@ -217,7 +117,7 @@ export class OpenRouterService {
     throw lastError || new Error("Unknown error during request");
   }
 
-  private async makeRequest<T>(
+  public async makeRequest<T>(
     prompt: string,
     parameters: ModelParameters,
     responseFormat: ResponseFormat,

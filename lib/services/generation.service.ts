@@ -1,9 +1,21 @@
 import { v4 as uuidv4 } from "uuid";
 import { createClient } from "@/supabase/supabase.server";
-import { FlashcardProposalDTO, CreateGenerationCommand } from "@/types";
 import { OpenRouterService } from "./openrouter.service";
-import { ContextLimitError, AuthenticationError, RateLimitError } from "./openrouter.error";
+import { ContextLimitError, ValidationError, ParsingError } from "./openrouter.error";
 import { generateMD5Hash } from "../utils";
+import { estimateTokenCount } from "../utils/token-counter";
+import { generateFlashcardsPrompt } from "../prompts/prompts";
+import { DEFAULT_FLASHCARD_SCHEMA } from "../utils/openrouter";
+import { FlashcardGenerationResponse, RequestMetadata } from "@/types/openrouter";
+import {
+  CefrLevel,
+  CreateGenerationCommand,
+  FLASHCARD_PROPOSAL_STATUS,
+  FlashcardProposalDTO,
+  FlashcardProposalStatus,
+  FlashcardSource,
+  SOURCE_TYPE,
+} from "@/types";
 
 export class GenerationService {
   private openRouterService: OpenRouterService;
@@ -24,9 +36,67 @@ export class GenerationService {
     proposals: FlashcardProposalDTO[];
     createdAt: string;
   }> {
+    const { source_text, source_type, front_language, back_language, cefr_level } = payload;
+    const generationId = uuidv4();
+    const startTime = Date.now();
+    const textLength = source_text.length;
+
+    if (!source_text) {
+      throw new ValidationError("Source text is required");
+    }
+
+    if (!front_language || !back_language) {
+      throw new ValidationError("Front and back languages are required");
+    }
+
+    const estimatedTokens = estimateTokenCount(source_text);
+    const modelTier = this.openRouterService.selectModelTier({
+      textLength,
+      complexity: cefr_level && ["C1", "C2"].includes(cefr_level) ? "high" : "medium",
+      priority: textLength > 5000 ? "quality" : "cost",
+    });
+    const modelConfig = this.openRouterService.getModelConfig(modelTier);
+
+    if (estimatedTokens > modelConfig.contextLimit) {
+      throw new ContextLimitError(estimatedTokens);
+    }
+
+    const parameters = { ...modelConfig.defaultParams };
+    const prompt = generateFlashcardsPrompt(payload);
+    const metadata: RequestMetadata = {
+      userId,
+      requestId: generationId,
+      startTime,
+    };
+
     try {
-      const { generationId, generationDuration, proposals, modelAI, createdAt } =
-        await this.openRouterService.generateFlashcards(userId, payload);
+      const { model, content } = await this.openRouterService.makeRequestWithRetry<FlashcardGenerationResponse>(
+        prompt,
+        parameters,
+        DEFAULT_FLASHCARD_SCHEMA,
+        metadata,
+        modelTier
+      );
+
+      if (!content || !Array.isArray(content.flashcards)) {
+        throw new ParsingError("Invalid flashcard generation response format");
+      }
+
+      const source = source_type === SOURCE_TYPE.YOUTUBE ? "ai_youtube_full" : "ai_text_full";
+
+      const proposals = content.flashcards.map((card) => ({
+        id: uuidv4(),
+        front_content: card.front_content,
+        back_content: card.back_content,
+        front_language: front_language,
+        back_language: back_language,
+        cefr_level: card.cefr_level as CefrLevel,
+        source: source as FlashcardSource,
+        status: FLASHCARD_PROPOSAL_STATUS.PENDING as FlashcardProposalStatus,
+      }));
+
+      const generationDuration = Date.now() - startTime;
+      const createdAt = new Date().toISOString();
 
       const generationRecord = await this.createGenerationRecord(
         userId,
@@ -34,7 +104,7 @@ export class GenerationService {
         generationId,
         generationDuration,
         proposals,
-        modelAI,
+        model,
         createdAt
       );
 
@@ -42,14 +112,6 @@ export class GenerationService {
 
       return { generationId, generationDuration, proposals, createdAt };
     } catch (error) {
-      if (error instanceof ContextLimitError) {
-        throw new Error(`Text is too long: ${error.message}`);
-      } else if (error instanceof AuthenticationError) {
-        throw new Error("Authentication failed. Contact support.");
-      } else if (error instanceof RateLimitError) {
-        throw new Error("Service temporarily unavailable. Please try again later.");
-      }
-
       await this.logGenerationError(userId, payload, error);
       throw error;
     }
