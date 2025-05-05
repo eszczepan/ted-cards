@@ -70,7 +70,7 @@ export class GenerationService {
     };
 
     try {
-      const { model, content } = await this.openRouterService.makeRequestWithRetry<FlashcardGenerationResponse>(
+      const { model, content, usage } = await this.openRouterService.makeRequestWithRetry<FlashcardGenerationResponse>(
         prompt,
         parameters,
         DEFAULT_FLASHCARD_SCHEMA,
@@ -97,7 +97,6 @@ export class GenerationService {
 
       const generationDuration = Date.now() - startTime;
       const createdAt = new Date().toISOString();
-
       const generationRecord = await this.createGenerationRecord(
         userId,
         payload,
@@ -107,8 +106,7 @@ export class GenerationService {
         model,
         createdAt
       );
-
-      console.log(generationRecord);
+      console.log({ ...generationRecord, totalTokens: usage.total_tokens });
 
       return { generationId, generationDuration, proposals, createdAt };
     } catch (error) {
