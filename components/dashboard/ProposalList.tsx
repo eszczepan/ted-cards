@@ -29,6 +29,8 @@ export function ProposalList({
     (p) => p.status === FLASHCARD_PROPOSAL_STATUS.ACCEPTED || p.status === FLASHCARD_PROPOSAL_STATUS.EDITED
   ).length;
 
+  const rejectedCount = proposals.filter((p) => p.status === FLASHCARD_PROPOSAL_STATUS.REJECTED).length;
+
   const totalCount = proposals.length;
 
   if (isLoading) {
@@ -39,7 +41,7 @@ export function ProposalList({
     return <InlineAlert message={error} variant="error" />;
   }
 
-  if (proposals.length === 0) {
+  if (totalCount === 0 || totalCount === rejectedCount) {
     return <InlineAlert message="No flashcards generated yet. Try submitting the form above." variant="info" />;
   }
 
@@ -48,8 +50,7 @@ export function ProposalList({
       <div className="flex flex-wrap justify-between items-center gap-4">
         <div>
           <p className="text-sm text-muted-foreground">
-            {totalCount} flashcards generated • {acceptedCount} accepted/edited •{" "}
-            {proposals.filter((p) => p.status === FLASHCARD_PROPOSAL_STATUS.REJECTED).length} rejected
+            {totalCount} flashcards generated • {acceptedCount} accepted/edited • {rejectedCount} rejected
           </p>
         </div>
 
@@ -68,18 +69,21 @@ export function ProposalList({
 
       <AnimatePresence>
         <div className="space-y-4">
-          {proposals.map((proposal) => (
-            <motion.div
-              key={proposal.id}
-              layout
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              transition={{ duration: 0.3 }}
-            >
-              <ProposalCard proposal={proposal} onUpdate={onUpdateProposal} />
-            </motion.div>
-          ))}
+          {proposals.map(
+            (proposal) =>
+              proposal.status !== FLASHCARD_PROPOSAL_STATUS.REJECTED && (
+                <motion.div
+                  key={proposal.id}
+                  layout
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <ProposalCard proposal={proposal} onUpdate={onUpdateProposal} />
+                </motion.div>
+              )
+          )}
         </div>
       </AnimatePresence>
     </div>
