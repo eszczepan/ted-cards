@@ -5,11 +5,6 @@ import { OpenRouterService } from "./openrouter.service";
 import { ContextLimitError, AuthenticationError, RateLimitError } from "./openrouter.error";
 import { generateMD5Hash } from "../utils";
 
-interface GenerateFlashcardsResult {
-  proposals: FlashcardProposalDTO[];
-  generationDuration: number;
-}
-
 export class GenerationService {
   private openRouterService: OpenRouterService;
 
@@ -17,22 +12,35 @@ export class GenerationService {
     this.openRouterService = new OpenRouterService({
       apiKey: process.env.OPENROUTER_API_KEY || "",
       defaultModel: "balanced",
-      maxRetries: 2,
     });
   }
 
-  async generateFlashcards(userId: string, params: CreateGenerationCommand): Promise<GenerateFlashcardsResult> {
-    const startTime = Date.now();
-
+  async generateFlashcards(
+    userId: string,
+    payload: CreateGenerationCommand
+  ): Promise<{
+    generationId: string;
+    generationDuration: number;
+    proposals: FlashcardProposalDTO[];
+    createdAt: string;
+  }> {
     try {
-      const proposals = await this.openRouterService.generateFlashcards(userId, params);
-      const endTime = Date.now();
-      const generationDuration = endTime - startTime;
+      const { generationId, generationDuration, proposals, modelAI, createdAt } =
+        await this.openRouterService.generateFlashcards(userId, payload);
 
-      return {
-        proposals,
+      const generationRecord = await this.createGenerationRecord(
+        userId,
+        payload,
+        generationId,
         generationDuration,
-      };
+        proposals,
+        modelAI,
+        createdAt
+      );
+
+      console.log(generationRecord);
+
+      return { generationId, generationDuration, proposals, createdAt };
     } catch (error) {
       if (error instanceof ContextLimitError) {
         throw new Error(`Text is too long: ${error.message}`);
@@ -42,35 +50,40 @@ export class GenerationService {
         throw new Error("Service temporarily unavailable. Please try again later.");
       }
 
-      await this.logGenerationError(userId, params, error);
+      await this.logGenerationError(userId, payload, error);
       throw error;
     }
   }
 
   async createGenerationRecord(
     userId: string,
-    params: CreateGenerationCommand,
-    result: GenerateFlashcardsResult
-  ): Promise<{ id: string; createdAt: string }> {
+    payload: CreateGenerationCommand,
+    generationId: string,
+    generationDuration: number,
+    proposals: FlashcardProposalDTO[],
+    modelAI: string,
+    createdAt: string
+  ): Promise<{
+    generationId: string;
+    generationDuration: number;
+    modelAI: string;
+    generatedCount: number;
+    createdAt: string;
+  }> {
     const supabase = await createClient();
-
-    const id = uuidv4();
-    const createdAt = new Date().toISOString();
-    const sourceTextHash = generateMD5Hash(params.source_text);
+    const sourceTextHash = generateMD5Hash(payload.source_text);
 
     const { error } = await supabase.from("generations").insert({
-      id,
+      id: generationId,
       user_id: userId,
-      model: "Add model here", // Use actual model info when available
-      generation_duration: result.generationDuration,
-      generated_count: result.proposals.length,
-      accepted_unedited_count: 0,
-      accepted_edited_count: 0,
-      source_type: params.source_type,
+      model: modelAI,
+      generation_duration: generationDuration,
+      generated_count: proposals.length,
+      source_type: payload.source_type,
       source_text_hash: sourceTextHash,
-      source_text_length: params.source_text.length,
-      source_youtube_url: params.source_youtube_url,
-      source_text: params.source_text,
+      source_text_length: payload.source_text.length,
+      source_youtube_url: payload.source_youtube_url,
+      source_text: payload.source_text,
       created_at: createdAt,
     });
 
@@ -79,22 +92,22 @@ export class GenerationService {
       throw new Error("Failed to create generation record");
     }
 
-    return { id, createdAt };
+    return { generationId, generationDuration, modelAI, generatedCount: proposals.length, createdAt };
   }
 
-  private async logGenerationError(userId: string, params: CreateGenerationCommand, error: unknown): Promise<void> {
+  private async logGenerationError(userId: string, payload: CreateGenerationCommand, error: unknown): Promise<void> {
     try {
       const supabase = await createClient();
-      const sourceTextHash = generateMD5Hash(params.source_text);
+      const sourceTextHash = generateMD5Hash(payload.source_text);
 
       await supabase.from("generation_error_logs").insert({
         id: uuidv4(),
         user_id: userId,
         model: "Add model here", // Use actual model info when available
-        source_type: params.source_type,
-        source_youtube_url: params.source_youtube_url,
+        source_type: payload.source_type,
+        source_youtube_url: payload.source_youtube_url,
         source_text_hash: sourceTextHash,
-        source_text_length: params.source_text.length,
+        source_text_length: payload.source_text.length,
         error_code: error instanceof Error ? error.name : "UNKNOWN_ERROR",
         error_message: error instanceof Error ? error.message : String(error),
         created_at: new Date().toISOString(),

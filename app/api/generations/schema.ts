@@ -8,7 +8,7 @@ const languageSchema = z.string().min(2, "Language code is required");
 const youtubeGenerationSchema = z.object({
   source_type: z.literal(SOURCE_TYPE.YOUTUBE),
   source_youtube_url: youtubeUrlSchema,
-  source_text: sourceTextSchema.optional(),
+  source_text: sourceTextSchema.min(1, "Source text is required"),
   front_language: languageSchema,
   back_language: languageSchema,
 });

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ModelParameters, ResponseFormat, SupportedModel } from "./openrouter.types";
+import { ModelParameters, ResponseFormat, SupportedModel } from "@/types/openrouter";
 import {
   AuthenticationError,
   ValidationError,
@@ -7,15 +7,11 @@ import {
   ParsingError,
   RateLimitError,
   ContextLimitError,
-} from "./openrouter.error";
+} from "../services/openrouter.error";
 
 export const openRouterConfigSchema = z.object({
   apiKey: z.string().min(1, "API key is required"),
   defaultModel: z.string().optional(),
-  timeout: z.number().int().positive().optional(),
-  baseUrl: z.string().url().optional(),
-  maxRetries: z.number().int().min(0).optional(),
-  retryDelay: z.number().int().min(100).optional(),
 });
 
 export const knownErrors = [

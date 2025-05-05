@@ -1,10 +1,6 @@
 export type OpenRouterServiceConfig = {
   apiKey: string;
   defaultModel?: SupportedModel;
-  timeout?: number;
-  baseUrl?: string;
-  maxRetries?: number;
-  retryDelay?: number;
 };
 
 export type SupportedModel = "economy" | "balanced" | "premium";

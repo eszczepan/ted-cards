@@ -6,7 +6,7 @@ import {
   OpenRouterResponse,
   SupportedModel,
   RequestMetadata,
-} from "./openrouter.types";
+} from "@/types/openrouter";
 import {
   AuthenticationError,
   ValidationError,
@@ -21,46 +21,60 @@ import {
   FLASHCARD_PROPOSAL_STATUS,
   CreateGenerationCommand,
   SOURCE_TYPE,
+  FlashcardProposalStatus,
+  FlashcardSource,
 } from "@/types";
 import { v4 as uuidv4 } from "uuid";
 import { estimateTokenCount } from "../utils/token-counter";
 import { sanitizeText } from "../utils/sanitize-text";
 import { sleep } from "../utils";
-import { openRouterConfigSchema, DEFAULT_FLASHCARD_SCHEMA, knownErrors, MODEL_CONFIGS } from "./openrouter.helpers";
+import { openRouterConfigSchema, DEFAULT_FLASHCARD_SCHEMA, knownErrors, MODEL_CONFIGS } from "../utils/openrouter";
 import { generateFlashcardsPrompt } from "../prompts/prompts";
 
 export class OpenRouterService {
   private apiKey: string;
   private defaultModelTier: SupportedModel;
-  private baseUrl: string;
-  private timeout: number;
-  private maxRetries: number;
-  private retryDelay: number;
-  private logger: Console;
+  private timeout = 60000;
+  private maxRetries = 3;
+  private retryDelay = 1000;
+  private logger = console;
 
   constructor(config: OpenRouterServiceConfig) {
-    this.validateConfig(config);
+    this.validateInitConfig(config);
 
     this.apiKey = config.apiKey;
     this.defaultModelTier = config.defaultModel || "balanced";
-    this.baseUrl = config.baseUrl || "https://openrouter.ai/api/v1";
-    this.timeout = config.timeout || 60000;
-    this.maxRetries = config.maxRetries || 3;
-    this.retryDelay = config.retryDelay || 1000;
-    this.logger = console;
   }
 
-  async generateFlashcards(userId: string, options: CreateGenerationCommand): Promise<FlashcardProposalDTO[]> {
-    this.validateGenerationInput(options);
+  async generateFlashcards(
+    userId: string,
+    options: CreateGenerationCommand
+  ): Promise<{
+    generationId: string;
+    generationDuration: number;
+    proposals: FlashcardProposalDTO[];
+    modelAI: string;
+    createdAt: string;
+  }> {
+    const { source_text, front_language, back_language, cefr_level } = options;
+    const generationId = uuidv4();
+    const startTime = Date.now();
+    const textLength = source_text.length;
 
-    const estimatedTokens = estimateTokenCount(options.source_text);
-    const textLength = options.source_text.length;
+    if (!source_text) {
+      throw new ValidationError("Source text is required");
+    }
+
+    if (!front_language || !back_language) {
+      throw new ValidationError("Front and back languages are required");
+    }
+
+    const estimatedTokens = estimateTokenCount(source_text);
     const modelTier = this.selectModelTier({
       textLength,
-      complexity: options.cefr_level && ["C1", "C2"].includes(options.cefr_level) ? "high" : "medium",
+      complexity: cefr_level && ["C1", "C2"].includes(cefr_level) ? "high" : "medium",
       priority: textLength > 5000 ? "quality" : "cost",
     });
-
     const modelConfig = this.getModelConfig(modelTier);
 
     if (estimatedTokens > modelConfig.contextLimit) {
@@ -71,17 +85,33 @@ export class OpenRouterService {
     const prompt = generateFlashcardsPrompt(options);
     const metadata: RequestMetadata = {
       userId,
-      requestId: uuidv4(),
-      startTime: Date.now(),
+      requestId: generationId,
+      startTime,
     };
 
     try {
       const data = await this.makeRequestWithRetry(prompt, parameters, DEFAULT_FLASHCARD_SCHEMA, metadata, modelTier);
-      const flashcards = this.parseFlashcardsResponse(data.choices[0].message.content);
+      const parsedFlashcards = this.parseFlashcardsResponse(data.choices[0].message.content);
+      const source = options.source_type === SOURCE_TYPE.YOUTUBE ? "ai_youtube_full" : "ai_text_full";
 
-      this.logSuccess(metadata, data, flashcards.length);
+      const flashcards = parsedFlashcards.map((card) => ({
+        id: uuidv4(),
+        front_content: card.front_content,
+        back_content: card.back_content,
+        front_language: options.front_language,
+        back_language: options.back_language,
+        cefr_level: card.cefr_level as CefrLevel,
+        source: source as FlashcardSource,
+        status: FLASHCARD_PROPOSAL_STATUS.PENDING as FlashcardProposalStatus,
+      }));
 
-      return this.mapToFlashcardProposals(flashcards, options);
+      return {
+        generationId,
+        generationDuration: Date.now() - startTime,
+        proposals: flashcards,
+        modelAI: data.model,
+        createdAt: new Date().toISOString(),
+      };
     } catch (error) {
       if (error instanceof Error && knownErrors.some((errorType) => error instanceof errorType)) {
         throw error;
@@ -193,7 +223,7 @@ export class OpenRouterService {
         response_format: responseFormat,
       };
 
-      const response = await fetch(`${this.baseUrl}/chat/completions`, {
+      const response = await fetch(`https://openrouter.ai/api/v1/chat/completions`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${this.apiKey}`,
@@ -264,35 +294,7 @@ export class OpenRouterService {
     }>;
   }
 
-  private mapToFlashcardProposals(
-    flashcards: Array<{ front_content: string; back_content: string; cefr_level: string }>,
-    options: CreateGenerationCommand
-  ): FlashcardProposalDTO[] {
-    const source = options.source_type === SOURCE_TYPE.YOUTUBE ? "ai_youtube_full" : "ai_text_full";
-
-    return flashcards.map((card) => ({
-      id: uuidv4(),
-      front_content: card.front_content,
-      back_content: card.back_content,
-      front_language: options.front_language,
-      back_language: options.back_language,
-      cefr_level: card.cefr_level as CefrLevel,
-      source,
-      status: FLASHCARD_PROPOSAL_STATUS.PENDING,
-    }));
-  }
-
-  private validateGenerationInput(options: CreateGenerationCommand): void {
-    if (!options.source_text) {
-      throw new ValidationError("Source text is required");
-    }
-
-    if (!options.front_language || !options.back_language) {
-      throw new ValidationError("Front and back languages are required");
-    }
-  }
-
-  private validateConfig(config: OpenRouterServiceConfig): void {
+  private validateInitConfig(config: OpenRouterServiceConfig): void {
     try {
       openRouterConfigSchema.parse(config);
     } catch (error) {
@@ -306,20 +308,6 @@ export class OpenRouterService {
     if (!config.apiKey) {
       throw new AuthenticationError("API key is required");
     }
-  }
-
-  private logError(error: Error, metadata: RequestMetadata): void {
-    const duration = Date.now() - metadata.startTime;
-
-    this.logger.error({
-      type: error.name,
-      message: error.message,
-      timestamp: new Date().toISOString(),
-      userId: metadata.userId || "unknown",
-      requestId: metadata.requestId,
-      model: this.defaultModelTier,
-      duration,
-    });
   }
 
   private logSuccess(metadata: RequestMetadata, data: OpenRouterResponse, flashcardCount: number): void {
@@ -337,6 +325,20 @@ export class OpenRouterService {
         total: data.usage.total_tokens,
       },
       flashcardCount,
+    });
+  }
+
+  private logError(error: Error, metadata: RequestMetadata): void {
+    const duration = Date.now() - metadata.startTime;
+
+    this.logger.error({
+      type: error.name,
+      message: error.message,
+      timestamp: new Date().toISOString(),
+      userId: metadata.userId || "unknown",
+      requestId: metadata.requestId,
+      model: this.defaultModelTier,
+      duration,
     });
   }
 }
