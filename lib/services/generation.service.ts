@@ -1,9 +1,8 @@
 import { v4 as uuidv4 } from "uuid";
 import { createClient } from "@/supabase/supabase.server";
 import { OpenRouterService } from "./openrouter.service";
-import { ContextLimitError, ValidationError, ParsingError } from "./openrouter.error";
+import { ValidationError, ParsingError } from "./openrouter.error";
 import { generateMD5Hash } from "../utils";
-import { estimateTokenCount } from "../utils/token-counter";
 import { generateFlashcardsPrompt } from "../prompts/prompts";
 import { DEFAULT_FLASHCARD_SCHEMA } from "../utils/openrouter";
 import { FlashcardGenerationResponse, RequestMetadata } from "@/types/openrouter";
@@ -23,7 +22,7 @@ export class GenerationService {
   constructor() {
     this.openRouterService = new OpenRouterService({
       apiKey: process.env.OPENROUTER_API_KEY || "",
-      defaultModel: "balanced",
+      defaultModel: "premium",
     });
   }
 
@@ -36,10 +35,15 @@ export class GenerationService {
     proposals: FlashcardProposalDTO[];
     createdAt: string;
   }> {
-    const { source_text, source_type, front_language, back_language, cefr_level } = payload;
+    const { source_text, source_type, front_language, back_language } = payload;
+    const prompt = generateFlashcardsPrompt(payload);
     const generationId = uuidv4();
     const startTime = Date.now();
-    const textLength = source_text.length;
+    const metadata: RequestMetadata = {
+      userId,
+      requestId: generationId,
+      startTime,
+    };
 
     if (!source_text) {
       throw new ValidationError("Source text is required");
@@ -49,33 +53,11 @@ export class GenerationService {
       throw new ValidationError("Front and back languages are required");
     }
 
-    const estimatedTokens = estimateTokenCount(source_text);
-    const modelTier = this.openRouterService.selectModelTier({
-      textLength,
-      complexity: cefr_level && ["C1", "C2"].includes(cefr_level) ? "high" : "medium",
-      priority: textLength > 5000 ? "quality" : "cost",
-    });
-    const modelConfig = this.openRouterService.getModelConfig(modelTier);
-
-    if (estimatedTokens > modelConfig.contextLimit) {
-      throw new ContextLimitError(estimatedTokens);
-    }
-
-    const parameters = { ...modelConfig.defaultParams };
-    const prompt = generateFlashcardsPrompt(payload);
-    const metadata: RequestMetadata = {
-      userId,
-      requestId: generationId,
-      startTime,
-    };
-
     try {
       const { model, content, usage } = await this.openRouterService.makeRequestWithRetry<FlashcardGenerationResponse>(
         prompt,
-        parameters,
         DEFAULT_FLASHCARD_SCHEMA,
-        metadata,
-        modelTier
+        metadata
       );
 
       if (!content || !Array.isArray(content.flashcards)) {

@@ -1,6 +1,5 @@
 import { z } from "zod";
 import {
-  ModelParameters,
   ResponseFormat,
   OpenRouterServiceConfig,
   OpenRouterResponse,
@@ -64,7 +63,6 @@ export class OpenRouterService {
 
   public async makeRequestWithRetry<T>(
     prompt: string,
-    parameters: ModelParameters,
     responseFormat: ResponseFormat,
     metadata: RequestMetadata,
     modelTier?: SupportedModel
@@ -73,7 +71,7 @@ export class OpenRouterService {
     let attempt = 0;
     while (attempt <= this.maxRetries) {
       try {
-        return await this.makeRequest<T>(prompt, parameters, responseFormat, metadata, modelTier);
+        return await this.makeRequest<T>(prompt, responseFormat, metadata, modelTier);
       } catch (error) {
         lastError = error instanceof Error ? error : new Error(String(error));
 
@@ -89,7 +87,7 @@ export class OpenRouterService {
         if (error instanceof RateLimitError && modelTier === "premium") {
           console.warn(`Rate limited on premium model, trying balanced model instead`);
           try {
-            return await this.makeRequest<T>(prompt, parameters, responseFormat, metadata, "balanced");
+            return await this.makeRequest<T>(prompt, responseFormat, metadata, "balanced");
           } catch {}
         }
 
@@ -119,7 +117,6 @@ export class OpenRouterService {
 
   public async makeRequest<T>(
     prompt: string,
-    parameters: ModelParameters,
     responseFormat: ResponseFormat,
     metadata: RequestMetadata,
     modelTier?: SupportedModel
@@ -136,7 +133,6 @@ export class OpenRouterService {
         messages: [{ role: "user", content: sanitizedPrompt }],
         stream: false,
         ...modelConfig.defaultParams,
-        ...parameters,
         response_format: responseFormat,
       };
 
