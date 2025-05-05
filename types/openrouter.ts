@@ -26,18 +26,9 @@ export type ResponseFormat = {
   };
 };
 
-export type OpenRouterResponse = {
-  id: string;
+export type OpenRouterResponse<T> = {
   model: string;
-  created: number;
-  choices: {
-    index: number;
-    message: {
-      role: MessageRole;
-      content: string;
-    };
-    finish_reason: string;
-  }[];
+  content: T;
   usage: {
     prompt_tokens: number;
     completion_tokens: number;
@@ -45,4 +36,10 @@ export type OpenRouterResponse = {
   };
 };
 
-type MessageRole = "system" | "user" | "assistant";
+export type FlashcardGenerationResponse = {
+  flashcards: Array<{
+    front_content: string;
+    back_content: string;
+    cefr_level: string;
+  }>;
+};

@@ -4,6 +4,7 @@ import {
   ResponseFormat,
   OpenRouterServiceConfig,
   OpenRouterResponse,
+  FlashcardGenerationResponse,
   SupportedModel,
   RequestMetadata,
 } from "@/types/openrouter";
@@ -89,11 +90,21 @@ export class OpenRouterService {
     };
 
     try {
-      const data = await this.makeRequestWithRetry(prompt, parameters, DEFAULT_FLASHCARD_SCHEMA, metadata, modelTier);
-      const parsedFlashcards = this.parseFlashcardsResponse(data.choices[0].message.content);
+      const { model, content } = await this.makeRequestWithRetry<FlashcardGenerationResponse>(
+        prompt,
+        parameters,
+        DEFAULT_FLASHCARD_SCHEMA,
+        metadata,
+        modelTier
+      );
+
+      if (!content || !Array.isArray(content.flashcards)) {
+        throw new ParsingError("Invalid flashcard generation response format");
+      }
+
       const source = options.source_type === SOURCE_TYPE.YOUTUBE ? "ai_youtube_full" : "ai_text_full";
 
-      const flashcards = parsedFlashcards.map((card) => ({
+      const proposals = content.flashcards.map((card) => ({
         id: uuidv4(),
         front_content: card.front_content,
         back_content: card.back_content,
@@ -107,8 +118,8 @@ export class OpenRouterService {
       return {
         generationId,
         generationDuration: Date.now() - startTime,
-        proposals: flashcards,
-        modelAI: data.model,
+        proposals,
+        modelAI: model,
         createdAt: new Date().toISOString(),
       };
     } catch (error) {
@@ -151,19 +162,18 @@ export class OpenRouterService {
     return MODEL_CONFIGS[modelTier];
   }
 
-  private async makeRequestWithRetry(
+  private async makeRequestWithRetry<T>(
     prompt: string,
     parameters: ModelParameters,
     responseFormat: ResponseFormat,
     metadata: RequestMetadata,
     modelTier?: SupportedModel
-  ): Promise<OpenRouterResponse> {
+  ): Promise<OpenRouterResponse<T>> {
     let lastError: Error | null = null;
     let attempt = 0;
-
     while (attempt <= this.maxRetries) {
       try {
-        return await this.makeRequest(prompt, parameters, responseFormat, metadata, modelTier);
+        return await this.makeRequest<T>(prompt, parameters, responseFormat, metadata, modelTier);
       } catch (error) {
         lastError = error instanceof Error ? error : new Error(String(error));
 
@@ -179,7 +189,7 @@ export class OpenRouterService {
         if (error instanceof RateLimitError && modelTier === "premium") {
           console.warn(`Rate limited on premium model, trying balanced model instead`);
           try {
-            return await this.makeRequest(prompt, parameters, responseFormat, metadata, "balanced");
+            return await this.makeRequest<T>(prompt, parameters, responseFormat, metadata, "balanced");
           } catch {}
         }
 
@@ -207,13 +217,13 @@ export class OpenRouterService {
     throw lastError || new Error("Unknown error during request");
   }
 
-  private async makeRequest(
+  private async makeRequest<T>(
     prompt: string,
     parameters: ModelParameters,
     responseFormat: ResponseFormat,
     metadata: RequestMetadata,
     modelTier?: SupportedModel
-  ): Promise<OpenRouterResponse> {
+  ): Promise<OpenRouterResponse<T>> {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), this.timeout);
     const modelConfig = this.getModelConfig(modelTier);
@@ -272,34 +282,12 @@ export class OpenRouterService {
         throw new ParsingError("Invalid API response format");
       }
 
-      return data as OpenRouterResponse;
+      const content = JSON.parse(data.choices[0].message.content) as T;
+
+      return { model: data.model, content, usage: data.usage };
     } finally {
       clearTimeout(timeoutId);
     }
-  }
-
-  private parseFlashcardsResponse(responseContent: string): Array<{
-    front_content: string;
-    back_content: string;
-    cefr_level: string;
-  }> {
-    let content: Record<string, unknown>;
-
-    try {
-      content = JSON.parse(responseContent);
-    } catch {
-      throw new ParsingError("Failed to parse JSON response");
-    }
-
-    if (!content || !content.flashcards || !Array.isArray(content.flashcards)) {
-      throw new ParsingError("Invalid flashcard generation response format");
-    }
-
-    return content.flashcards as Array<{
-      front_content: string;
-      back_content: string;
-      cefr_level: string;
-    }>;
   }
 
   private validateInitConfig(config: OpenRouterServiceConfig): void {
