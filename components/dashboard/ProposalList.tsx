@@ -24,14 +24,12 @@ export function ProposalList({
   onUpdateProposal,
   error,
 }: ProposalListProps) {
-  // Count accepted/edited proposals
-  const acceptedCount = proposals.filter(
+  const safeProposals = Array.isArray(proposals) ? proposals : [];
+  const acceptedCount = safeProposals.filter(
     (p) => p.status === FLASHCARD_PROPOSAL_STATUS.ACCEPTED || p.status === FLASHCARD_PROPOSAL_STATUS.EDITED
   ).length;
-
-  const rejectedCount = proposals.filter((p) => p.status === FLASHCARD_PROPOSAL_STATUS.REJECTED).length;
-
-  const totalCount = proposals.length;
+  const rejectedCount = safeProposals.filter((p) => p.status === FLASHCARD_PROPOSAL_STATUS.REJECTED).length;
+  const totalCount = safeProposals.length;
 
   if (isLoading) {
     return <SkeletonLoader count={3} height={200} />;
@@ -69,7 +67,7 @@ export function ProposalList({
 
       <AnimatePresence>
         <div className="space-y-4">
-          {proposals.map(
+          {safeProposals.map(
             (proposal) =>
               proposal.status !== FLASHCARD_PROPOSAL_STATUS.REJECTED && (
                 <motion.div

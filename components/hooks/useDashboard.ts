@@ -82,6 +82,10 @@ export function useDashboard() {
 
       const responseData = await response.json();
 
+      if (!response.ok) {
+        throw new Error(responseData.error || "Failed to generate flashcards");
+      }
+
       setState((prev) => ({
         ...prev,
         generationState: "success",

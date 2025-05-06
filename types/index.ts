@@ -210,8 +210,8 @@ export interface GenerationDetailDTO extends GenerationDTO {
 // Komenda do rozpoczęcia nowego procesu generacji
 export interface CreateGenerationCommand {
   source_type: SourceType;
-  source_text: string; // max 15000 znaków
-  source_youtube_url?: string; // wymagane jeśli source_type to youtube
+  source_text: string;
+  source_youtube_url?: string;
   front_language: string;
   back_language: string;
   cefr_level?: CefrLevel;

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { DEFAULT_USER_ID } from "@/supabase/supabase.server";
 import { createGenerationSchema } from "./schema";
 import { GenerationService } from "@/lib/services/generation.service";
+import { YoutubeService } from "@/lib/services/youtube.service";
 
 export async function POST(request: Request) {
   try {
@@ -24,12 +25,35 @@ export async function POST(request: Request) {
     // 2. Create Supabase client and get user ID
     const user_id = DEFAULT_USER_ID; // In production, this would come from auth
 
-    // 3. Use GenerationService to generate flashcards
-    const generationService = new GenerationService();
+    // 3. Use YoutubeService to get transcript
+    if (validatedData.source_type === "youtube") {
+      console.log("1. Getting transcript from Youtube");
+      const youtubeService = new YoutubeService();
+      const transcript = await youtubeService.transcriptWithYoutubeTranscript(validatedData.source_youtube_url);
+      validatedData.source_text = transcript;
+    }
+
+    // Ensure source_text is defined
+    if (!validatedData.source_text) {
+      return NextResponse.json(
+        {
+          error: `Failed to get text content from ${validatedData.source_type} source.`,
+          details: validatedData,
+        },
+        { status: 400 }
+      );
+    }
 
     try {
+      // 4. Use GenerationService to generate flashcards
+      const generationService = new GenerationService();
       // Generate flashcard proposals
-      const generationResult = await generationService.generateFlashcards(user_id, validatedData);
+      const generationResult = await generationService.generateFlashcards(user_id, {
+        source_type: validatedData.source_type,
+        source_text: validatedData.source_text,
+        front_language: validatedData.front_language,
+        back_language: validatedData.back_language,
+      });
 
       return NextResponse.json(
         {
