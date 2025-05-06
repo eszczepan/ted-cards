@@ -3,7 +3,6 @@ import { getSubtitles } from "youtube-captions-scraper";
 
 export class YoutubeService {
   async transcriptWithCaptionsScraper(url: string): Promise<string> {
-    console.log("2. Getting transcript from Youtube with captions scraper");
     const videoId = this.extractVideoId(url);
 
     if (!videoId) {
@@ -15,7 +14,6 @@ export class YoutubeService {
       lang: "en",
     });
     const text = subtitles.map((s) => s.text).join(" ");
-    console.log("3. Transcript from Youtube with captions scraper", text);
     return this.cleanTranscript(text).slice(0, 15000);
   }
 
