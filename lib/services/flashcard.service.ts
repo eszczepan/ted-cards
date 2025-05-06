@@ -46,13 +46,21 @@ export class FlashcardService {
         back_language: flashcard.back_language,
         cefr_level: flashcard.cefr_level,
         source: flashcard.source,
-        source_youtube_url: flashcard.source_youtube_url || null,
+        source_youtube_url: flashcard.source_youtube_url || undefined,
         generation_id: generationId,
         status: FLASHCARD_STATUS.ACTIVE,
         created_at: now,
         updated_at: now,
       }));
       const { data, error } = await supabase.from("flashcards").insert(flashcardRecords).select();
+
+      console.info({
+        userId,
+        generationId,
+        source: flashcardRecords[0].source,
+        source_youtube_url: flashcardRecords[0].source_youtube_url,
+        totalCreated: data?.length,
+      });
 
       if (error) {
         console.error("Error creating flashcards:", error);

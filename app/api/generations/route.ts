@@ -27,9 +27,8 @@ export async function POST(request: Request) {
 
     // 3. Use YoutubeService to get transcript
     if (validatedData.source_type === "youtube") {
-      console.log("1. Getting transcript from Youtube");
       const youtubeService = new YoutubeService();
-      const transcript = await youtubeService.transcriptWithYoutubeTranscript(validatedData.source_youtube_url);
+      const transcript = await youtubeService.transcriptWithCaptionsScraper(validatedData.source_youtube_url);
       validatedData.source_text = transcript;
     }
 

@@ -37,31 +37,6 @@ export function useDashboard() {
     selectedSourceType: SOURCE_TYPE.YOUTUBE,
   });
 
-  // Form input handlers
-  function handleInputChange(field: keyof CreateGenerationCommand, value: string) {
-    setState((prev) => ({
-      ...prev,
-      formInput: {
-        ...prev.formInput,
-        [field]: value,
-      },
-    }));
-  }
-
-  function handleSourceTypeChange(sourceType: SourceType) {
-    setState((prev) => ({
-      ...prev,
-      selectedSourceType: sourceType,
-      formInput: {
-        ...prev.formInput,
-        source_type: sourceType,
-        // Clear the irrelevant field based on the new source type
-        ...(sourceType === SOURCE_TYPE.YOUTUBE ? { source_text: "" } : { source_youtube_url: "" }),
-      },
-    }));
-  }
-
-  // API interaction handlers
   async function handleGenerateSubmit(data: CreateGenerationCommand) {
     if (state.generationState === "loading") return;
 
@@ -133,7 +108,7 @@ export function useDashboard() {
         back_language: proposal.back_language,
         cefr_level: proposal.cefr_level,
         source: proposal.source,
-        source_youtube_url: state.formInput.source_youtube_url,
+        source_youtube_url: proposal.source_youtube_url || undefined,
       }));
 
       const response = await fetch("/api/flashcards", {
@@ -171,7 +146,11 @@ export function useDashboard() {
   async function handleSaveAll() {
     if (state.saveState === "loading") return;
 
-    if (state.proposals.length === 0) return;
+    const notRejectedProposals = state.proposals.filter(
+      (proposal) => proposal.status !== FLASHCARD_PROPOSAL_STATUS.REJECTED
+    );
+
+    if (notRejectedProposals.length === 0) return;
 
     setState((prev) => ({
       ...prev,
@@ -180,14 +159,14 @@ export function useDashboard() {
     }));
 
     try {
-      const flashcardsToSave: CreateFlashcardDTO[] = state.proposals.map((proposal) => ({
+      const flashcardsToSave: CreateFlashcardDTO[] = notRejectedProposals.map((proposal) => ({
         front_content: proposal.front_content,
         back_content: proposal.back_content,
         front_language: proposal.front_language,
         back_language: proposal.back_language,
         cefr_level: proposal.cefr_level,
         source: proposal.source,
-        source_youtube_url: proposal.source_youtube_url,
+        source_youtube_url: proposal.source_youtube_url || undefined,
       }));
 
       const response = await fetch("/api/flashcards", {
@@ -224,8 +203,6 @@ export function useDashboard() {
 
   return {
     ...state,
-    handleInputChange,
-    handleSourceTypeChange,
     handleGenerateSubmit,
     handleUpdateProposal,
     handleSaveAccepted,

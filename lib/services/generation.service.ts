@@ -89,7 +89,7 @@ export class GenerationService {
         model,
         createdAt
       );
-      console.log({ ...generationRecord, totalTokens: usage.total_tokens });
+      console.info({ ...generationRecord, totalTokens: usage.total_tokens });
 
       return { generationId, generationDuration, proposals, createdAt };
     } catch (error) {

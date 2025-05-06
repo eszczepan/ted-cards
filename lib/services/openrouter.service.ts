@@ -80,7 +80,7 @@ export class OpenRouterService {
           error instanceof ValidationError ||
           error instanceof ContextLimitError
         ) {
-          console.log(lastError, metadata);
+          console.error(lastError, metadata);
           throw error;
         }
 

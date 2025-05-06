@@ -19,8 +19,8 @@ export type GenerationFormBase = {
 };
 
 type GenerationFormProps = {
-  onSubmit: (data: CreateGenerationCommand) => void;
   isLoading: boolean;
+  onSubmit: (data: CreateGenerationCommand) => void;
 };
 
 export function GenerationForm({ onSubmit, isLoading }: GenerationFormProps) {
@@ -55,10 +55,11 @@ export function GenerationForm({ onSubmit, isLoading }: GenerationFormProps) {
 
   const handleSourceTypeChange = (value: SourceType) => {
     setValue("source_type", value);
+    setValue("source_youtube_url", "");
+    setValue("source_text", "");
   };
 
   const onSubmitForm = (data: GenerationFormBase) => {
-    console.log("1 step", data.source_youtube_url);
     onSubmit(data as CreateGenerationCommand);
   };
 

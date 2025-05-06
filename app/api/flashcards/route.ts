@@ -15,7 +15,7 @@ export async function POST(request: Request) {
           error: "Invalid request data",
           details: validationResult.error.format(),
         },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -32,7 +32,7 @@ export async function POST(request: Request) {
       const createdFlashcards = await flashcardService.createFlashcards(
         user_id,
         validatedData.flashcards,
-        validatedData.generation_id || null,
+        validatedData.generation_id || null
       );
 
       // Return successful response
@@ -42,7 +42,7 @@ export async function POST(request: Request) {
           created_count: createdFlashcards.length,
           flashcards: createdFlashcards,
         },
-        { status: 201 },
+        { status: 201 }
       );
     } catch (error) {
       console.error("Flashcard service error:", error);
@@ -51,7 +51,7 @@ export async function POST(request: Request) {
           error: "Failed to create flashcards",
           message: error instanceof Error ? error.message : "Unknown error",
         },
-        { status: 500 },
+        { status: 500 }
       );
     }
   } catch (error) {

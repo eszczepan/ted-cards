@@ -30,13 +30,13 @@ export const createFlashcardsSchema = z
       return !data.flashcards.some(
         (card) =>
           (card.source === FLASHCARD_SOURCE.AI_YOUTUBE_FULL || card.source === FLASHCARD_SOURCE.AI_YOUTUBE_EDITED) &&
-          !card.source_youtube_url,
+          !card.source_youtube_url
       );
     },
     {
       message: "YouTube URL is required for flashcards with YouTube source",
       path: ["flashcards"],
-    },
+    }
   );
 
 export const flashcardResponseSchema = z.object({

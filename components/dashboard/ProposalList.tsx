@@ -54,7 +54,7 @@ export function ProposalList({
 
         <div className="flex flex-wrap gap-3">
           <Button variant="outline" onClick={onSaveAll} disabled={isSaving || totalCount === 0}>
-            {isSaving ? "Saving..." : `Save All (${totalCount})`}
+            {isSaving ? "Saving..." : `Save All (${totalCount - rejectedCount})`}
           </Button>
 
           <Button onClick={onSaveAccepted} disabled={isSaving || acceptedCount === 0}>
