@@ -35,7 +35,7 @@ export class GenerationService {
     proposals: FlashcardProposalDTO[];
     createdAt: string;
   }> {
-    const { source_text, source_type, front_language, back_language } = payload;
+    const { source_text, source_type, front_language, back_language, source_youtube_url } = payload;
     const prompt = generateFlashcardsPrompt(payload);
     const generationId = uuidv4();
     const startTime = Date.now();
@@ -75,6 +75,7 @@ export class GenerationService {
         cefr_level: card.cefr_level as CefrLevel,
         source: source as FlashcardSource,
         status: FLASHCARD_PROPOSAL_STATUS.PENDING as FlashcardProposalStatus,
+        source_youtube_url: source_youtube_url,
       }));
 
       const generationDuration = Date.now() - startTime;

@@ -69,6 +69,7 @@ export function useDashboard() {
       ...prev,
       generationState: "loading",
       generationError: null,
+      saveError: null,
     }));
 
     try {
@@ -186,7 +187,7 @@ export function useDashboard() {
         back_language: proposal.back_language,
         cefr_level: proposal.cefr_level,
         source: proposal.source,
-        source_youtube_url: state.formInput.source_youtube_url,
+        source_youtube_url: proposal.source_youtube_url,
       }));
 
       const response = await fetch("/api/flashcards", {

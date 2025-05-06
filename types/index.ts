@@ -200,6 +200,7 @@ export interface FlashcardProposalDTO {
   cefr_level: CefrLevel;
   source: FlashcardSource;
   status?: FlashcardProposalStatus; // tymczasowy status propozycji
+  source_youtube_url?: string;
 }
 
 // Szczegóły generacji z dołączonymi propozycjami fiszek

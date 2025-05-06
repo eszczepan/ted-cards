@@ -30,7 +30,7 @@ export class FlashcardService {
   async createFlashcards(
     userId: string,
     flashcards: CreateFlashcardRequest[],
-    generationId: string | null = null,
+    generationId: string | null = null
   ): Promise<FlashcardDTO[]> {
     try {
       const supabase = await createClient();
@@ -44,16 +44,14 @@ export class FlashcardService {
         back_content: flashcard.back_content,
         front_language: flashcard.front_language,
         back_language: flashcard.back_language,
-        cefr_level: flashcard.cefr_level as CefrLevel,
-        source: flashcard.source as FlashcardSource,
+        cefr_level: flashcard.cefr_level,
+        source: flashcard.source,
         source_youtube_url: flashcard.source_youtube_url || null,
         generation_id: generationId,
         status: FLASHCARD_STATUS.ACTIVE,
         created_at: now,
         updated_at: now,
       }));
-
-      // Insert flashcards in a batch operation
       const { data, error } = await supabase.from("flashcards").insert(flashcardRecords).select();
 
       if (error) {

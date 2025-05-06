@@ -58,6 +58,7 @@ export function GenerationForm({ onSubmit, isLoading }: GenerationFormProps) {
   };
 
   const onSubmitForm = (data: GenerationFormBase) => {
+    console.log("1 step", data.source_youtube_url);
     onSubmit(data as CreateGenerationCommand);
   };
 

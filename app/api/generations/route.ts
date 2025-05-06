@@ -53,6 +53,7 @@ export async function POST(request: Request) {
         source_text: validatedData.source_text,
         front_language: validatedData.front_language,
         back_language: validatedData.back_language,
+        source_youtube_url: validatedData.source_youtube_url,
       });
 
       return NextResponse.json(
