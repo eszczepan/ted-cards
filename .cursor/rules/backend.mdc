@@ -1,6 +1,6 @@
 ---
 description: 
-globs: middleware.ts,supabase/*.ts,app/auth/actions.ts
+globs: middleware.ts,supabase/*.ts,lib/actions/auth.actions.ts
 alwaysApply: false
 ---
 ### Backend and Database
@@ -8,7 +8,8 @@ alwaysApply: false
 - Use Supabase for backend services, including authentication and database interactions.
 - Follow Supabase guidelines for security and performance.
 - Use Zod schemas to validate data exchanged with the backend.
-- Use Server-Side Auth for Next.js 
+- Use Server-Side Auth for Next.js
+- Use Server-Side Auth for Next.js (refer to `supabase-auth.mdc` for detailed Supabase integration and setup).
 - Use Client Component client from `supabase/supabase.client.ts` - to access Supabase from Client Components, which run in the browser.
 - Use Server Component client from `supabase/supabase.server.ts` - to access Supabase from Server Components, Server Actions, and Route Handlers, which run only on the server.
 - Use middleware `supabase/middleware.ts` and `middleware.ts` that are responsible for:
