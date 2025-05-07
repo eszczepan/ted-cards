@@ -1,3 +1,4 @@
+import React from "react";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
@@ -19,11 +20,11 @@ export const metadata: Metadata = {
   description: "Generate flashcards from YouTube videos using AI",
 };
 
-export default function PublicLayout({
-  children,
-}: Readonly<{
+interface PublicLayoutProps {
   children: React.ReactNode;
-}>) {
+}
+
+export default function PublicLayout({ children }: PublicLayoutProps) {
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
@@ -33,9 +34,14 @@ export default function PublicLayout({
               <span className="sr-only">TedCards</span>
               TedCards
             </Link>
-            <Link href="/login">
-              <Button>Login</Button>
-            </Link>
+            <div className="flex items-center gap-x-2">
+              <Link href="/login">
+                <Button>Login</Button>
+              </Link>
+              <Link href="/signup">
+                <Button variant="outline">Sign Up</Button>
+              </Link>
+            </div>
           </div>
         </header>
         <main className="flex-1 pt-16">{children}</main>
