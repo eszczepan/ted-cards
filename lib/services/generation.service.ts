@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 import { createClient } from "@/supabase/supabase.server";
 import { OpenRouterService } from "./openrouter.service";
-import { ValidationError, ParsingError } from "./openrouter.error";
+import { ValidationError, ParsingError } from "../errors";
 import { generateMD5Hash } from "../utils";
 import { generateFlashcardsPrompt } from "../prompts/prompts";
 import { DEFAULT_FLASHCARD_SCHEMA } from "../utils/openrouter";

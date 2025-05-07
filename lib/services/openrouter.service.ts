@@ -13,7 +13,7 @@ import {
   ParsingError,
   RateLimitError,
   ContextLimitError,
-} from "./openrouter.error";
+} from "../errors";
 import { sanitizeText } from "../utils/sanitize-text";
 import { sleep } from "../utils";
 import { openRouterConfigSchema, MODEL_CONFIGS } from "../utils/openrouter";

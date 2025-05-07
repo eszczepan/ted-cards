@@ -7,7 +7,7 @@ import {
   ParsingError,
   RateLimitError,
   ContextLimitError,
-} from "../services/openrouter.error";
+} from "../errors";
 
 export const openRouterConfigSchema = z.object({
   apiKey: z.string().min(1, "API key is required"),
