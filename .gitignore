@@ -46,3 +46,6 @@ next-env.d.ts
 .env.keys
 .env.local
 .env.*.local
+
+# AI
+.cursor/mcp.json
