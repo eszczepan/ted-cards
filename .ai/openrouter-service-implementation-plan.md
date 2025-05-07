@@ -86,21 +86,13 @@ System powinien logować wszystkie błędy z odpowiednimi metadanymi:
 lib/
   services/
     openrouter.service.ts
-    openrouter.error.ts
-    openrouter.types.ts
-  utils/
-    token-counter.ts
 ```
 
-### 6.2. Implementacja klas błędów
-
-Stworzenie pliku `openrouter.error.ts` z hierarchią błędów opisaną w sekcji 4
-
-### 6.3. Definicja typów
+### 6.2. Definicja typów
 
 Stworzenie pliku `openrouter.types.ts` z wszystkimi interfejsami i typami używanymi przez usługę.
 
-### 6.4. Implementacja utility do liczenia tokenów
+### 6.3. Implementacja utility do liczenia tokenów
 
 Stworzenie pliku `token-counter.ts` z funkcją szacującą liczbę tokenów w tekście.
 
@@ -110,7 +102,7 @@ Stworzenie pliku `openrouter.service.ts` z implementacją klasy `OpenRouterServi
 
 ### 6.6. Rozszerzenie `GenerationService`
 
-Modyfikacja istniejącej klasy `GenerationService`, aby wykorzystywała `OpenRouterService` zamiast mokowanych danych:
+Modyfikacja istniejącej klasy `GenerationService`, aby wykorzystywała `OpenRouterService` zamiast mokowanych danych do generowania fiszek.
 
 ### 6.8. Monitorowanie
 
