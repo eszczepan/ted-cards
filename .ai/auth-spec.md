@@ -111,42 +111,39 @@ Logika backendowa będzie realizowana głównie przez Next.js Server Actions. Ro
 
 ### 3.1. Server Actions
 
-Pliki `actions.ts` będą umieszczone obok stron, które ich używają lub w centralnym miejscu, jeśli są współdzielone.
+Wszystkie Server Actions związane z autentykacją będą umieszczone w jednym pliku: `lib/actions/auth.actions.ts`. Powinny one zawierać walidację danych wejściowych po stronie serwera (np. przy użyciu biblioteki Zod), obsługę błędów oraz odpowiednie przekierowania i rewalidację ścieżek.
 
-- **`app/(public)/signup/actions.ts`**:
-  - `async function signup(formData: FormData)`:
-    - Pobiera `email`, `password` z `formData`.
-    - Waliduje dane używając schematu Zod (email, min. dł. hasła). Sprawdza zgodność `password` i `confirmPassword` (jeśli `confirmPassword` jest częścią `formData`).
-    - Tworzy klienta Supabase dla Server Actions (`import { createClient } from '@/lib/utils/supabase/server'`).
-    - Wywołuje `supabase.auth.signUp({ email, password, options: { emailRedirectTo: '${process.env.NEXT_PUBLIC_BASE_URL}/auth/confirm' } })`.
-    - Zwraca obiekt `{ error }` lub `{ data }` do UI.
-- **`app/(public)/login/actions.ts`**:
-  - `async function login(formData: FormData)`:
-    - Pobiera `email`, `password` z `formData`.
-    - Waliduje dane (Zod).
-    - Tworzy klienta Supabase dla Server Actions.
-    - Wywołuje `supabase.auth.signInWithPassword({ email, password })`.
-    - Jeśli sukces, Supabase ustawi ciasteczka sesji. Server Action może użyć `redirect('/')` lub `redirect('/dashboard')` z `next/navigation`.
-    - Zwraca `{ error }` do UI w przypadku niepowodzenia.
-- **`app/(public)/reset-password/actions.ts`**:
-  - `async function requestPasswordReset(formData: FormData)`:
-    - Pobiera `email` z `formData`.
-    - Waliduje (Zod).
-    - Tworzy klienta Supabase dla Server Actions.
-    - Wywołuje `supabase.auth.resetPasswordForEmail(email, { redirectTo: '${process.env.NEXT_PUBLIC_BASE_URL}/auth/confirm?next=/update-password' })`. Parametr `next` w `redirectTo` może być użyty przez `auth/confirm` do przekierowania po pomyślnej weryfikacji tokenu.
-    - Zwraca `{ error }` lub informację o sukcesie.
-- **`app/(public)/update-password/actions.ts`**:
-  - `async function updatePassword(formData: FormData)`:
-    - Pobiera `newPassword`, `confirmNewPassword` z `formData`.
-    - Waliduje (Zod), sprawdza zgodność haseł.
-    - Tworzy klienta Supabase dla Server Actions.
-    - Wywołuje `supabase.auth.updateUser({ password: newPassword })`. Ta operacja powiedzie się, jeśli użytkownik ma aktywną sesję (np. po weryfikacji tokenu OTP przez `auth/confirm`).
-    - Zwraca `{ error }`. W przypadku sukcesu, inicjuje `redirect('/login')`.
-- **Akcja wylogowania (np. `app/actions/auth.ts` lub w `components/layout/actions.ts`)**:
-  - `async function logout()`:
-    - Tworzy klienta Supabase dla Server Actions.
-    - Wywołuje `supabase.auth.signOut()`.
-    - Inicjuje `redirect('/login')`.
+- **`async function signup(formData: FormData)`**:
+  - Pobiera `email`, `password` z `formData`.
+  - Waliduje dane (Zod: poprawność emaila, minimalna długość hasła).
+  - Tworzy klienta Supabase dla Server Actions (`import { createClient } from '@/supabase/server'`).
+  - Wywołuje `supabase.auth.signUp({ email, password, options: { emailRedirectTo: \`\${headers().get('origin')}/auth/confirm\` } })`.
+  - Jeśli błąd (np. email już istnieje), zwraca informację o błędzie (np. przez redirect z komunikatem query param: `/signup?message=...`).
+  - Jeśli sukces, informuje użytkownika o konieczności potwierdzenia adresu email (np. przez redirect: `/signup?message=Confirmation email sent. Please check your inbox.`). Użytkownik nie jest automatycznie logowany ani przekierowywany do dashboardu na tym etapie.
+- **`async function login(formData: FormData)`**:
+  - Pobiera `email`, `password` z `formData`.
+  - Waliduje dane (Zod).
+  - Tworzy klienta Supabase dla Server Actions.
+  - Wywołuje `supabase.auth.signInWithPassword({ email, password })`.
+  - Jeśli błąd (np. nieprawidłowe dane, email niepotwierdzony), zwraca informację o błędzie (np. przez redirect: `/login?message=Could not authenticate user`).
+  - Jeśli sukces, Supabase ustawi ciasteczka sesji. Wykonuje `revalidatePath('/', 'layout')` i przekierowuje do `/dashboard` (`redirect('/dashboard')` z `next/navigation`).
+- **`async function requestPasswordReset(formData: FormData)`**:
+  - Pobiera `email` z `formData`.
+  - Waliduje (Zod: poprawność emaila).
+  - Tworzy klienta Supabase dla Server Actions.
+  - Wywołuje `supabase.auth.resetPasswordForEmail(email, { redirectTo: \`\${headers().get('origin')}/auth/confirm?next=/update-password\` })`. Parametr `next`w`redirectTo`jest używany przez`app/auth/confirm/route.ts` do przekierowania po pomyślnej weryfikacji tokenu.
+  - Zawsze zwraca generyczną wiadomość (np. przez redirect: `/reset-password?message=If your email address is in our database...`), aby nie ujawniać, czy konto istnieje.
+- **`async function updatePassword(formData: FormData)`**:
+  - Pobiera `newPassword` (i opcjonalnie `confirmNewPassword`) z `formData`.
+  - Waliduje (Zod: minimalna długość hasła, zgodność haseł, jeśli `confirmNewPassword` jest obecne).
+  - Tworzy klienta Supabase dla Server Actions.
+  - Wywołuje `supabase.auth.updateUser({ password: newPassword })`. Ta operacja powiedzie się, jeśli użytkownik ma aktywną sesję pozwalającą na zmianę hasła (np. po weryfikacji tokenu OTP przez `app/auth/confirm/route.ts`).
+  - Jeśli błąd, zwraca informację o błędzie (np. przez redirect: `/update-password?message=...`).
+  - Jeśli sukces, przekierowuje do `/login` z komunikatem o pomyślnej zmianie hasła (`redirect('/login?message=Password has been updated successfully...')`).
+- **`async function logout()`**:
+  - Tworzy klienta Supabase dla Server Actions.
+  - Wywołuje `supabase.auth.signOut()`.
+  - Wykonuje `revalidatePath('/', 'layout')` i przekierowuje do `/login` (`redirect('/login')`).
 
 ### 3.2. Route Handlers
 
@@ -174,28 +171,31 @@ Pliki `actions.ts` będą umieszczone obok stron, które ich używają lub w cen
 
 ### 3.5. Renderowanie Stron (Server-Side)
 
-- Strony publiczne (`/login`, `/signup`, etc.) będą renderowane jako Server Components. Mogą one sprawdzić, czy użytkownik jest już zalogowany (używając klienta Supabase dla serwera) i w razie potrzeby przekierować go do `/dashboard` (np. w `middleware.ts` lub na początku komponentu strony).
-- Strony chronione (`/dashboard` i inne) będą Server Components. Będą używać `createClient` (server) i `supabase.auth.getUser()` do pobrania danych użytkownika. Jeśli użytkownik nie jest zalogowany lub wystąpi błąd, nastąpi przekierowanie do `/login` (realizowane głównie przez middleware).
+- Strony publiczne (`/login`, `/signup`, etc.) będą renderowane jako Server Components. Mogą one sprawdzić, czy użytkownik jest już zalogowany (używając klienta Supabase dla serwera) i w razie potrzeby przekierować go do `/dashboard`. To przekierowanie dla zalogowanych użytkowników próbujących uzyskać dostęp do stron autentykacji może być również obsługiwane w layoutcie tych stron publicznych lub w głównym middleware.
+- Strony chronione (`/dashboard` i inne) będą Server Components. Będą używać `createClient` (server) i `supabase.auth.getUser()` do pobrania danych użytkownika. Jeśli użytkownik nie jest zalogowany lub wystąpi błąd, nastąpi przekierowanie do `/login`. **Ochrona tras i logika przekierowań dla niezalogowanych użytkowników próbujących uzyskać dostęp do chronionych zasobów powinna być realizowana głównie w odpowiednich Layoutach (np. `app/dashboard/layout.tsx`)**, a nie w głównym pliku `middleware.ts`, którego głównym zadaniem związanym z autentykacją jest odświeżanie sesji.
 
 ## 4. System Autentykacji (Supabase + Next.js SSR)
 
-Integracja z Supabase będzie następować zgodnie z oficjalną dokumentacją dla Next.js App Router (`@supabase/ssr` package).
+Integracja z Supabase będzie następować zgodnie z oficjalną dokumentacją dla Next.js App Router (`@supabase/ssr` package) oraz wytycznymi z dokumentu `supabase-auth.mdc`.
 
 ### 4.1. Konfiguracja Supabase
 
 - Zmienne środowiskowe `NEXT_PUBLIC_SUPABASE_URL` i `NEXT_PUBLIC_SUPABASE_ANON_KEY` w pliku `.env.local`.
-- Należy również dodać `NEXT_PUBLIC_BASE_URL` (np. `http://localhost:3000` dla dewelopmentu) do `.env.local` i używać go przy konstruowaniu `emailRedirectTo` i `redirectTo`.
+- Należy również dodać `NEXT_PUBLIC_BASE_URL` (np. `http://localhost:3000` dla dewelopmentu, odpowiednia wartość dla produkcji) do `.env.local`. Ta zmienna będzie używana do konfiguracji "Site URL" w panelu Supabase (Auth -> URL Configuration) oraz jako `{{ .SiteURL }}` w szablonach e-mail.
+- Dla parametrów `emailRedirectTo` (w akcji `signup`) oraz `redirectTo` (w akcji `requestPasswordReset`) w Server Actions zaleca się dynamiczne pobieranie `origin` za pomocą `headers().get('origin')` dla zapewnienia większej elastyczności i poprawności działania w różnych środowiskach wdrożeniowych (np. Vercel preview deployments).
 - Konfiguracja szablonów email w panelu Supabase (Auth -> Templates):
   - **Confirm signup:** Zmień `{{ .ConfirmationURL }}` na `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=signup`.
   - **Reset password:** Zmień `{{ .ConfirmationURL }}` na `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=recovery`. (Supabase używa `verifyOtp` dla obu).
-- W panelu Supabase (Auth -> URL Configuration) ustawić "Site URL" na `NEXT_PUBLIC_BASE_URL`.
+- W panelu Supabase (Auth -> URL Configuration) ustawić "Site URL" na wartość zgodną z `NEXT_PUBLIC_BASE_URL`.
 
 ### 4.2. Klienty Supabase
 
-- **`lib/utils/supabase/client.ts`**: (Dla Client Components)
+Zgodnie z `supabase-auth.mdc`, pliki klientów Supabase powinny znajdować się w katalogu `supabase/`.
+
+- **`supabase/supabase.client.ts`**: (Dla Client Components)
 
   ```typescript
-  // lib/utils/supabase/client.ts
+  // supabase/supabase.client.ts
   import { createBrowserClient } from "@supabase/ssr";
 
   export function createClient() {
@@ -203,10 +203,10 @@ Integracja z Supabase będzie następować zgodnie z oficjalną dokumentacją dl
   }
   ```
 
-- **`lib/utils/supabase/server.ts`**: (Dla Server Components, Actions, Route Handlers)
+- **`supabase/supabase.server.ts`**: (Dla Server Components, Actions, Route Handlers)
 
   ```typescript
-  // lib/utils/supabase/server.ts
+  // supabase/supabase.server.ts
   import { createServerClient, type CookieOptions } from "@supabase/ssr";
   import { cookies } from "next/headers";
 
@@ -219,39 +219,37 @@ Integracja z Supabase będzie następować zgodnie z oficjalną dokumentacją dl
           return cookieStore.get(name)?.value;
         },
         set(name: string, value: string, options: CookieOptions) {
-          // If the set method is called from a Server Component, an error will be thrown
-          // This can be ignored if you have middleware refreshing
-          // user sessions.
           try {
             cookieStore.set({ name, value, ...options });
-          } catch (error) {}
+          } catch (error) {
+            // The `set` method was called from a Server Component.
+            // This can be ignored if you have middleware refreshing
+            // user sessions.
+          }
         },
         remove(name: string, options: CookieOptions) {
-          // If the remove method is called from a Server Component, an error will be thrown
-          // This can be ignored if you have middleware refreshing
-          // user sessions.
           try {
             cookieStore.set({ name, value: "", ...options });
-          } catch (error) {}
+          } catch (error) {
+            // The `delete` method was called from a Server Component.
+            // This can be ignored if you have middleware refreshing
+            // user sessions.
+          }
         },
       },
     });
   }
   ```
 
-### 4.3. Middleware
-
-- **`middleware.ts`**: (Na poziomie roota projektu lub `./src`)
-
-  - Odpowiedzialny za odświeżanie sesji użytkownika i ochronę tras.
+- **`supabase/middleware.ts`**: (Helper dla Next.js Middleware)
+  Ten plik będzie zawierał logikę do odświeżania sesji użytkownika, zgodnie z `supabase-auth.mdc`.
 
   ```typescript
-  // middleware.ts
+  // supabase/middleware.ts
+  import { createServerClient, type CookieOptions } from "@supabase/ssr";
   import { type NextRequest, NextResponse } from "next/server";
-  import { createServerClient } from "@supabase/ssr"; // Użyjemy createServerClient bezpośrednio dla uproszczenia
-  // lub dedykowanej funkcji updateSession, jeśli jest bardziej złożona
 
-  export async function middleware(request: NextRequest) {
+  export async function updateSession(request: NextRequest) {
     let response = NextResponse.next({
       request: {
         headers: request.headers,
@@ -266,64 +264,45 @@ Integracja z Supabase będzie następować zgodnie z oficjalną dokumentacją dl
           get(name: string) {
             return request.cookies.get(name)?.value;
           },
-          set(name: string, value: string, options) {
+          set(name: string, value: string, options: CookieOptions) {
             request.cookies.set({ name, value, ...options });
-            response = NextResponse.next({
-              request: {
-                headers: request.headers,
-              },
-            });
+            response = NextResponse.next({ request: { headers: request.headers } });
             response.cookies.set({ name, value, ...options });
           },
-          remove(name: string, options) {
+          remove(name: string, options: CookieOptions) {
             request.cookies.set({ name, value: "", ...options });
-            response = NextResponse.next({
-              request: {
-                headers: request.headers,
-              },
-            });
+            response = NextResponse.next({ request: { headers: request.headers } });
             response.cookies.set({ name, value: "", ...options });
           },
         },
       }
     );
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    const { pathname } = request.nextUrl;
-
-    // Ochrona tras dashboardu
-    if (!user && pathname.startsWith("/dashboard")) {
-      const loginUrl = new URL("/login", request.url);
-      loginUrl.searchParams.set("next", pathname); // Opcjonalnie: przekieruj z powrotem po zalogowaniu
-      return NextResponse.redirect(loginUrl);
-    }
-
-    // Przekierowanie zalogowanych użytkowników ze stron publicznych auth
-    if (user && (pathname === "/login" || pathname === "/signup" || pathname === "/reset-password")) {
-      return NextResponse.redirect(new URL("/dashboard", request.url));
-    }
-
-    // Nie chronimy /update-password, bo dostęp jest kontrolowany przez token/sesję po kliknięciu linku
+    // Refresh session if expired - important to do this before Server Component rendered
+    await supabase.auth.getUser();
 
     return response;
   }
+  ```
+
+### 4.3. Middleware
+
+- **`middleware.ts`**: (Na poziomie roota projektu `/`)
+
+  - Główny plik `middleware.ts` będzie "chudy" i jego głównym zadaniem będzie wywołanie funkcji `updateSession` z `supabase/middleware.ts` w celu zarządzania sesją i odświeżania tokenów.
+  - Logika ochrony tras (np. przekierowanie niezalogowanych użytkowników z `/dashboard` do `/login` lub zalogowanych użytkowników z `/login` do `/dashboard`) powinna być implementowana przede wszystkim w odpowiednich Layoutach (np. `app/dashboard/layout.tsx`) lub na poziomie poszczególnych stron (Server Components).
+
+  ```typescript
+  // middleware.ts
+  import { type NextRequest } from "next/server";
+  import { updateSession } from "@/supabase/middleware"; // Dostosuj ścieżkę, jeśli katalog supabase jest gdzie indziej
+
+  export async function middleware(request: NextRequest) {
+    return await updateSession(request);
+  }
 
   export const config = {
-    matcher: [
-      /*
-       * Dopasuj wszystkie ścieżki żądań oprócz tych zaczynających się od:
-       * - _next/static (pliki statyczne)
-       * - _next/image (pliki optymalizacji obrazów)
-       * - favicon.ico (plik favicon)
-       * - /auth/ (dla callbacków API, np. /auth/confirm)
-       * - /api/ (jeśli masz inne endpointy API niechronione przez to middleware)
-       * Możesz zmodyfikować ten wzorzec.
-       */
-      "/((?!_next/static|_next/image|favicon.ico|auth/.*|api/.*|.*.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
-    ],
+    matcher: ["/((?!_next/static|_next/image|favicon.ico|auth/.*|api/.*|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"],
   };
   ```
 
@@ -336,27 +315,27 @@ Integracja z Supabase będzie następować zgodnie z oficjalną dokumentacją dl
 
 ## 5. Struktura Katalogów (zmiany i dodatki)
 
+Po uwzględnieniu wytycznych z `supabase-auth.mdc`, kluczowe pliki i katalogi związane z autentykacją będą wyglądać następująco:
+
 - `app/(public)/login/page.tsx`
-- `app/(public)/login/actions.ts`
 - `app/(public)/signup/page.tsx`
-- `app/(public)/signup/actions.ts`
 - `app/(public)/reset-password/page.tsx`
-- `app/(public)/reset-password/actions.ts`
 - `app/(public)/update-password/page.tsx`
-- `app/(public)/update-password/actions.ts`
-- `app/(public)/layout.tsx` (nowy lub modyfikacja)
-- `app/auth/confirm/route.ts`
-- `app/actions/auth.ts` (opcjonalnie, dla np. akcji wylogowania, jeśli nie w `components/layout`)
+- `app/(public)/layout.tsx` (layout dla stron publicznych)
+- `app/auth/confirm/route.ts` (Route Handler dla potwierdzeń email i resetu hasła)
+- `app/dashboard/layout.tsx` (Przykład layoutu chronionego, implementujący logikę ochrony trasy)
+- `lib/actions/auth.actions.ts` (Skonsolidowane Server Actions dla autentykacji)
 - `components/shared/AuthFormWrapper.tsx`
 - `components/shared/LoginForm.tsx`
 - `components/shared/SignupForm.tsx`
 - `components/shared/ResetPasswordRequestForm.tsx`
 - `components/shared/UpdatePasswordForm.tsx`
-- `lib/utils/supabase/client.ts`
-- `lib/utils/supabase/server.ts`
-- `middleware.ts` (w root lub `src/`)
-- Modyfikacje w `components/layout/Sidebar.tsx` (dodanie przycisku wylogowania i logiki)
-- `.env.local` (dodanie/weryfikacja zmiennych Supabase i `NEXT_PUBLIC_BASE_URL`)
+- `supabase/supabase.client.ts` (Klient Supabase dla Client Components)
+- `supabase/supabase.server.ts` (Klient Supabase dla Server Components, Actions, Route Handlers)
+- `supabase/middleware.ts` (Helper dla głównego pliku middleware, zawiera logikę `updateSession`)
+- `middleware.ts` (Główny plik middleware w root projektu lub `src/`)
+- Modyfikacje w `components/layout/Sidebar.tsx` (dodanie przycisku wylogowania i logiki wywołującej Server Action `logout`)
+- `.env.local` (weryfikacja zmiennych Supabase: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, oraz `NEXT_PUBLIC_BASE_URL`)
 
 ## 6. Podsumowanie Kluczowych Wniosków
 

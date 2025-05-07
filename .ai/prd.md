@@ -186,7 +186,7 @@ Kryteria akceptacji:
 
 - Logowanie i rejestracja odbywają się na dedykowanych stronach.
 - Logowanie wymaga podania adresu email i hasła.
-- Rejestracja wymaga podania adresu email, hasła i potwierdzenia hasła.
+- Rejestracja wymaga podania adresu email i hasła. W celu poprawy doświadczenia użytkownika i zmniejszenia ryzyka pomyłek, zaleca się dodanie pola do potwierdzenia hasła po stronie klienta w formularzu rejestracyjnym.
 - Użytkownik może się wylogować z systemu poprzez przycisk w sidebarze jezeli jest zalogowany.
 - Nie korzystamy z zewnętrznych serwisów logowania (np. Google, GitHub).
 - Odzyskiwanie hasła powinno być możliwe.
