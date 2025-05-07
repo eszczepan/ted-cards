@@ -120,15 +120,17 @@ Opis: Jako nowy użytkownik chcę się zarejestrować, aby mieć dostęp do wła
 Kryteria akceptacji:
 
 - Formularz rejestracyjny zawiera pola na adres e-mail i hasło.
-- Po poprawnym wypełnieniu formularza i weryfikacji danych konto jest aktywowane.
-- Użytkownik otrzymuje potwierdzenie pomyślnej rejestracji i zostaje zalogowany.
+- Po poprawnym wypełnieniu formularza użytkownik otrzymuje email z linkiem aktywacyjnym.
+- Po kliknięciu w link aktywacyjny i pomyślnej weryfikacji, konto użytkownika zostaje aktywowane.
+- Po aktywacji konta, użytkownik zostaje automatycznie zalogowany i przekierowany do dashboardu.
+- Użytkownik otrzymuje potwierdzenie pomyślnej rejestracji.
 
 ID: US-008
 Tytuł: Logowanie do aplikacji
-Opis: Jako zarejestrowany użytkownik chcę móc się zalogować, aby mieć dostęp do moich fiszek i historii generowania.
+Opis: Jako zarejestrowany użytkownik chcę móc się zalogować, aby mieć dostęp do generowania fiszek i wszystkich zapisanych fiszek.
 Kryteria akceptacji:
 
-- Po podaniu prawidłowych danych logowania użytkownik zostaje przekierowany do widoku generowania fiszek.
+- Po podaniu prawidłowych danych logowania użytkownik zostaje przekierowany do widoku generowania fiszek (dashboard).
 - Błędne dane logowania wyświetlają komunikat o nieprawidłowych danych.
 - Dane dotyczące logowania przechowywane są w bezpieczny sposób.
 
@@ -185,8 +187,7 @@ Kryteria akceptacji:
 - Logowanie i rejestracja odbywają się na dedykowanych stronach.
 - Logowanie wymaga podania adresu email i hasła.
 - Rejestracja wymaga podania adresu email, hasła i potwierdzenia hasła.
-- Użytkownik może logować się do systemu poprzez przycisk w prawym górnym rogu.
-- Użytkownik może się wylogować z systemu poprzez przycisk w sidebarze
+- Użytkownik może się wylogować z systemu poprzez przycisk w sidebarze jezeli jest zalogowany.
 - Nie korzystamy z zewnętrznych serwisów logowania (np. Google, GitHub).
 - Odzyskiwanie hasła powinno być możliwe.
 
