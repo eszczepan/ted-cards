@@ -176,6 +176,20 @@ Kryteria akceptacji:
 - Automatycznie generowany poziom CEFR.
 - Wyswietlana jest lista wygenerowanych propozycji fiszek do akceptacji przez uzytkownika
 
+ID: US-013
+
+Tytuł: Bezpieczny dostęp i uwierzytelnianie
+Opis: Jako użytkownik chcę mieć możliwość rejestracji i logowania się do systemu w sposób zapewniający bezpieczeństwo moich danych.
+Kryteria akceptacji:
+
+- Logowanie i rejestracja odbywają się na dedykowanych stronach.
+- Logowanie wymaga podania adresu email i hasła.
+- Rejestracja wymaga podania adresu email, hasła i potwierdzenia hasła.
+- Użytkownik może logować się do systemu poprzez przycisk w prawym górnym rogu.
+- Użytkownik może się wylogować z systemu poprzez przycisk w sidebarze
+- Nie korzystamy z zewnętrznych serwisów logowania (np. Google, GitHub).
+- Odzyskiwanie hasła powinno być możliwe.
+
 ## 6. Metryki sukcesu
 
 1. Efektywność generowania fiszek:
