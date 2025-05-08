@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { AuthFormWrapper } from "@/components/shared/AuthFormWrapper";
+import { AuthFormWrapper } from "@/components/auth/AuthFormWrapper";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,7 +14,7 @@ export function ResetPasswordRequestForm() {
       description="Enter your email address and we'll send you a link to reset your password."
       footerContent={
         <p>
-          Remembered your password?{}
+          Remembered your password?{" "}
           <Link href="/login" className="font-semibold text-primary hover:underline">
             Back to sign in
           </Link>

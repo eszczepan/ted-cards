@@ -26,7 +26,7 @@ export default function Home() {
         </div>
       </header>
       <div className="flex flex-col min-h-screen">
-        <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 bg-blue-50">
+        <section className="w-full mt-[64px] py-12 md:py-24 lg:py-32 xl:py-48 bg-blue-50">
           <div className="container max-w-screen-xl mx-auto px-4 md:px-6 space-y-10 xl:space-y-16">
             <div className="grid gap-8 lg:grid-cols-[1fr_400px] lg:gap-12 xl:grid-cols-[1fr_600px]">
               <AnimatedContainer>

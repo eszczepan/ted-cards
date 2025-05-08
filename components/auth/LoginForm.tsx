@@ -2,21 +2,21 @@
 
 import React from "react";
 import Link from "next/link";
-import { AuthFormWrapper } from "@/components/shared/AuthFormWrapper";
+import { AuthFormWrapper } from "@/components/auth/AuthFormWrapper";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-export function SignupForm() {
+export function LoginForm() {
   return (
     <AuthFormWrapper
-      title="Create an account"
-      description="Enter your details below to create your account"
+      title="Welcome back"
+      description="Sign in to your account to continue"
       footerContent={
         <p>
-          Already have an account?{}
-          <Link href="/login" className="font-semibold text-primary hover:underline">
-            Sign in
+          Don&apos;t have an account?{" "}
+          <Link href="/signup" className="font-semibold text-primary hover:underline">
+            Sign up
           </Link>
         </p>
       }
@@ -28,29 +28,23 @@ export function SignupForm() {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="password">Password</Label>
+          <div className="flex items-center justify-between">
+            <Label htmlFor="password">Password</Label>
+            <Link href="/reset-password" className="text-sm font-medium text-primary hover:underline">
+              Forgot your password?
+            </Link>
+          </div>
           <Input
             id="password"
             name="password"
             type="password"
-            autoComplete="new-password"
+            autoComplete="current-password"
             placeholder="Enter your password"
           />
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="confirmPassword">Confirm Password</Label>
-          <Input
-            id="confirmPassword"
-            name="confirmPassword"
-            type="password"
-            autoComplete="new-password"
-            placeholder="Confirm your password"
-          />
-        </div>
-
         <Button type="submit" className="w-full bg-gray-900 text-white hover:bg-gray-800">
-          Sign up
+          Sign in
         </Button>
       </form>
     </AuthFormWrapper>
