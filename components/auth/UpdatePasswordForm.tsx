@@ -1,8 +1,5 @@
-"use client";
-
-import React from "react";
 import Link from "next/link";
-import { AuthFormWrapper } from "@/components/shared/AuthFormWrapper";
+import { AuthFormWrapper } from "@/components/auth/AuthFormWrapper";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
