@@ -3,6 +3,7 @@ import { AuthFormWrapper } from "@/components/auth/AuthFormWrapper";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { register } from "@/lib/actions/auth.actions";
 
 export function SignupForm() {
   return (
@@ -46,7 +47,7 @@ export function SignupForm() {
           />
         </div>
 
-        <Button type="submit" className="w-full bg-gray-900 text-white hover:bg-gray-800">
+        <Button formAction={register} className="w-full bg-gray-900 text-white hover:bg-gray-800">
           Sign up
         </Button>
       </form>

@@ -50,7 +50,7 @@ export default function Home() {
                       ease: "easeOut",
                     }}
                   >
-                    <Link href="/signup">
+                    <Link href="/dashboard">
                       <Button size="lg" className="w-full">
                         Try TedCards Free
                       </Button>
