@@ -3,6 +3,8 @@
 import { GenerationForm } from "@/components/dashboard/GenerationForm";
 import { ProposalList } from "@/components/dashboard/ProposalList";
 import { useDashboard } from "@/components/hooks/useDashboard";
+import { logout } from "@/lib/actions/auth.actions";
+import { Button } from "@/components/ui/button";
 
 export default function Dashboard() {
   const {
@@ -24,6 +26,12 @@ export default function Dashboard() {
     <div className="min-h-screen p-4 sm:p-8 font-[family-name:var(--font-geist-sans)]">
       <main className="flex flex-col gap-8 max-w-5xl mx-auto w-full">
         <section className="w-full flex flex-col items-center mt-6">
+          <form action={logout}>
+            <Button type="submit" className="mb-6 w-full max-w-xs bg-red-600 hover:bg-red-700 text-white">
+              Log out
+            </Button>
+          </form>
+
           <div className="mb-6 text-center">
             <h2 className="text-2xl font-semibold mb-2">Generate Flashcards</h2>
             <p className="text-muted-foreground">Generate flashcards from YouTube videos or text input.</p>

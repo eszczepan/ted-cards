@@ -15,9 +15,11 @@ export async function GET(request: NextRequest) {
       type,
       token_hash,
     });
+
     if (!error) {
       redirect(next);
     }
   }
+
   redirect("/error");
 }
