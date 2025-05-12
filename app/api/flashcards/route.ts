@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { DEFAULT_USER_ID } from "@/supabase/supabase.server";
 import { createFlashcardsSchema } from "./schema";
 import { FlashcardService } from "@/lib/services/flashcard.service";
+import { createClient } from "@/supabase/supabase.server";
 
 export async function POST(request: Request) {
   try {
@@ -21,8 +21,23 @@ export async function POST(request: Request) {
 
     const validatedData = validationResult.data;
 
-    // 2. Create Supabase client and get user ID
-    const user_id = DEFAULT_USER_ID; // In production, this would come from auth
+    // 2. Create Supabase client and get authenticated user ID
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return NextResponse.json(
+        {
+          error: "Authentication required",
+          details: "User must be logged in to create flashcards",
+        },
+        { status: 401 }
+      );
+    }
+
+    const user_id = user.id;
 
     // 3. Use FlashcardService to create flashcards
     const flashcardService = new FlashcardService();
