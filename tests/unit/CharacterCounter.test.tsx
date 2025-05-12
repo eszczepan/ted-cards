@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { CharacterCounter } from "../../components/shared/CharacterCounter";
+import { CharacterCounter } from "@/components/shared/CharacterCounter";
 
 describe("CharacterCounter", () => {
   it("should display current and max character count", () => {
