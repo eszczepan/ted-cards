@@ -8,6 +8,7 @@ A web application that automatically generates educational flashcards from YouTu
 - [Tech Stack](#tech-stack)
 - [Getting Started](#getting-started)
 - [Available Scripts](#available-scripts)
+- [Testing](#testing)
 - [Project Scope](#project-scope)
 - [Project Status](#project-status)
 - [License](#license)
@@ -103,6 +104,58 @@ TedCards is designed to simplify and accelerate the process of creating educatio
 - `npm run build` - Builds the application for production
 - `npm run start` - Starts the production server
 - `npm run lint` - Runs ESLint to check code quality
+- `npm run test` - Runs unit tests
+- `npm run test:watch` - Runs tests in watch mode
+- `npm run test:ui` - Runs tests with UI interface
+- `npm run test:coverage` - Runs tests with coverage report
+- `npm run test:e2e` - Runs end-to-end tests
+- `npm run test:e2e:ui` - Runs end-to-end tests with UI
+- `npm run test:e2e:report` - Shows the end-to-end test report
+
+## Testing
+
+This project uses Vitest for unit testing and Playwright for end-to-end testing.
+
+### Directory Structure
+
+```
+tests/
+├── e2e/            # End-to-end tests (Playwright)
+│   ├── models/     # Page Object Models
+│   └── *.spec.ts   # E2E test files
+├── unit/           # Unit tests (Vitest)
+│   ├── hooks/      # Hook tests
+│   └── *.test.tsx  # Component tests
+└── setup.ts        # Test environment configuration
+```
+
+### Unit Testing (Vitest)
+
+The project uses Vitest as the testing framework for unit tests with the following best practices:
+
+- Use `vi.fn()` for mocking functions
+- Use `vi.spyOn()` to monitor existing functions
+- Use `vi.mock()` for module mocking
+- Create setup files for test configuration
+- Write readable tests using the Arrange-Act-Assert pattern
+
+### End-to-End Testing (Playwright)
+
+Playwright is used for E2E testing with the following guidelines:
+
+- Implement Page Object Model for maintainable tests
+- Use role-based locators for resilient element selection
+- Use `expect(page).toHaveScreenshot()` for visual comparisons
+- Avoid flaky tests by ensuring proper wait conditions
+- Use isolated browser contexts for tests
+
+### Testing Best Practices
+
+1. Test behavior, not implementation
+2. Write tests that are easy to maintain
+3. Avoid dependencies between tests
+4. Use unit tests for logic testing and E2E tests for user flows
+5. Ensure tests are deterministic (always returning the same result)
 
 ## Project Scope
 
