@@ -15,7 +15,6 @@ type ProposalCardProps = {
   onUpdate: (updatedProposal: FlashcardProposalDTO) => void;
 };
 
-// Schema for edit validation
 const editSchema = z.object({
   front_content: z
     .string()
@@ -36,7 +35,6 @@ export function ProposalCard({ proposal, onUpdate }: ProposalCardProps) {
   });
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
-  // Define available CEFR levels
   const cefrLevels = [
     { value: CEFR_LEVEL.A1, label: "A1 - Beginner" },
     { value: CEFR_LEVEL.A2, label: "A2 - Elementary" },
@@ -46,16 +44,13 @@ export function ProposalCard({ proposal, onUpdate }: ProposalCardProps) {
     { value: CEFR_LEVEL.C2, label: "C2 - Proficient" },
   ];
 
-  // Handle CEFR level change
   function handleCefrChange(value: CefrLevel) {
     if (!isEditing) {
-      // If not in edit mode, directly update the proposal
       onUpdate({
         ...proposal,
         cefr_level: value,
       });
     } else {
-      // If in edit mode, update the local state
       setEditValues({
         ...editValues,
         cefr_level: value,
@@ -63,14 +58,12 @@ export function ProposalCard({ proposal, onUpdate }: ProposalCardProps) {
     }
   }
 
-  // Handle edit form input change
   function handleEditChange(field: keyof EditFormValues, value: string) {
     setEditValues({
       ...editValues,
       [field]: value,
     });
 
-    // Clear validation error for this field if it exists
     if (validationErrors[field]) {
       const newErrors = { ...validationErrors };
       delete newErrors[field];
@@ -78,7 +71,6 @@ export function ProposalCard({ proposal, onUpdate }: ProposalCardProps) {
     }
   }
 
-  // Validate form data
   function validateForm(): boolean {
     try {
       editSchema.parse(editValues);
@@ -97,7 +89,6 @@ export function ProposalCard({ proposal, onUpdate }: ProposalCardProps) {
     }
   }
 
-  // Handle Save edit button click
   function handleSaveEdit() {
     if (validateForm()) {
       onUpdate({
@@ -111,7 +102,6 @@ export function ProposalCard({ proposal, onUpdate }: ProposalCardProps) {
     }
   }
 
-  // Handle Cancel edit button click
   function handleCancelEdit() {
     setEditValues({
       front_content: proposal.front_content,
@@ -122,7 +112,6 @@ export function ProposalCard({ proposal, onUpdate }: ProposalCardProps) {
     setIsEditing(false);
   }
 
-  // Handle Accept button click
   function handleAccept() {
     onUpdate({
       ...proposal,
@@ -130,7 +119,6 @@ export function ProposalCard({ proposal, onUpdate }: ProposalCardProps) {
     });
   }
 
-  // Handle Reject button click
   function handleReject() {
     onUpdate({
       ...proposal,
@@ -138,12 +126,10 @@ export function ProposalCard({ proposal, onUpdate }: ProposalCardProps) {
     });
   }
 
-  // Handle Edit button click
   function handleEdit() {
     setIsEditing(true);
   }
 
-  // Card border color based on status
   const statusBorderColors = {
     [FLASHCARD_PROPOSAL_STATUS.ACCEPTED]: "border-green-500",
     [FLASHCARD_PROPOSAL_STATUS.EDITED]: "border-blue-500",
@@ -163,7 +149,6 @@ export function ProposalCard({ proposal, onUpdate }: ProposalCardProps) {
     >
       <div className="space-y-4">
         {!isEditing ? (
-          // View Mode
           <>
             <div className="space-y-2">
               <div className="font-medium text-lg">Front Side</div>
@@ -176,7 +161,6 @@ export function ProposalCard({ proposal, onUpdate }: ProposalCardProps) {
             </div>
           </>
         ) : (
-          // Edit Mode
           <>
             <div className="space-y-2">
               <label htmlFor={`front-${proposal.id}`} className="font-medium text-lg">
@@ -230,7 +214,6 @@ export function ProposalCard({ proposal, onUpdate }: ProposalCardProps) {
 
           <div className="flex gap-2 self-end sm:self-auto">
             {isEditing ? (
-              // Edit Mode Actions
               <>
                 <Button onClick={handleSaveEdit} variant="default">
                   Save
@@ -240,7 +223,6 @@ export function ProposalCard({ proposal, onUpdate }: ProposalCardProps) {
                 </Button>
               </>
             ) : (
-              // View Mode Actions
               <>
                 {(proposal.status === FLASHCARD_PROPOSAL_STATUS.REJECTED ||
                   proposal.status === FLASHCARD_PROPOSAL_STATUS.PENDING) && (
