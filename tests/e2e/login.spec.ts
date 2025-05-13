@@ -5,12 +5,21 @@ import { HomePage } from "./models/HomePage";
 test.describe("Login Flow", () => {
   let loginPage: LoginPage;
   let homePage: HomePage;
+  let testUser: {
+    username: string;
+    password: string;
+    userId: string;
+  };
 
   test.beforeEach(async ({ page }) => {
     loginPage = new LoginPage(page);
     homePage = new HomePage(page);
 
-    await page.route("**/supabase.co/**", (route) => route.abort());
+    testUser = await loginPage.getEnvironmentVariables();
+
+    if (!testUser.username || !testUser.password) {
+      test.skip(true, "Test requires E2E_USERNAME and E2E_PASSWORD environment variables");
+    }
   });
 
   test("should display login form", async () => {
@@ -25,38 +34,18 @@ test.describe("Login Flow", () => {
     await loginPage.expectPageLoaded();
   });
 
-  test("should show error for invalid credentials", async ({ page }) => {
-    await page.route("**/rest/v1/auth/**", async (route) => {
-      await route.fulfill({
-        status: 400,
-        contentType: "application/json",
-        body: JSON.stringify({
-          error: "Invalid login credentials",
-          message: "Invalid login credentials",
-        }),
-      });
-    });
-
+  test("should show error for invalid credentials", async () => {
     await loginPage.goto();
     await loginPage.login("wrong@example.com", "wrongpassword");
 
-    const emailInput = await loginPage.emailInput;
-    const passwordInput = await loginPage.passwordInput;
-
-    await expect(emailInput).toHaveValue("wrong@example.com");
-    await expect(passwordInput).toHaveValue("wrongpassword");
-
-    await expect(await page.locator('input[name="email"]')).toHaveValue("wrong@example.com");
+    await loginPage.expectError();
   });
 
-  test("should verify valid login credentials", async ({ page }) => {
+  test("should login successfully with valid credentials", async () => {
     await loginPage.goto();
-    await loginPage.login("test@example.com", "password123");
+    await loginPage.login(testUser.username, testUser.password);
 
-    await expect(await page.locator('input[name="email"]')).toHaveValue("test@example.com");
-    await expect(await page.locator('input[name="password"]')).toHaveValue("password123");
-
-    await expect(await page.locator('button[type="submit"]')).toBeEnabled();
+    await loginPage.expectRedirectToDashboard();
   });
 
   test("should navigate to signup page from login", async ({ page }) => {

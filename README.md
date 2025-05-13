@@ -144,10 +144,34 @@ The project uses Vitest as the testing framework for unit tests with the followi
 Playwright is used for E2E testing with the following guidelines:
 
 - Implement Page Object Model for maintainable tests
-- Use role-based locators for resilient element selection
+- Use data-testid attributes for resilient element selection
 - Use `expect(page).toHaveScreenshot()` for visual comparisons
 - Avoid flaky tests by ensuring proper wait conditions
 - Use isolated browser contexts for tests
+
+#### Setting Up E2E Tests
+
+1. Create a `.env.local` file with the following variables (or add to existing file):
+
+```
+# E2E Testing - fill with a valid Supabase test user
+E2E_USERNAME=your_test_email@example.com
+E2E_PASSWORD=your_test_password
+E2E_USERNAME_ID=your_test_user_id_from_supabase
+```
+
+2. Run E2E tests with:
+
+```bash
+npm run test:e2e          # Run tests in headless mode
+npm run test:e2e:ui       # Run tests with UI
+```
+
+3. View test reports with:
+
+```bash
+npm run test:e2e:report
+```
 
 ### Testing Best Practices
 

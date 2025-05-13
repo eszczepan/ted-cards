@@ -20,15 +20,18 @@ export function LoginForm() {
       footerContent={
         <p>
           Don&apos;t have an account?{" "}
-          <Link href="/signup" className="font-semibold text-primary hover:underline">
+          <Link href="/signup" className="font-semibold text-primary hover:underline" data-testid="signup-link">
             Sign up
           </Link>
         </p>
       }
     >
-      <form className="space-y-6" action={formAction}>
+      <form className="space-y-6" action={formAction} data-testid="login-form">
         {formState.errors._form && (
-          <div className="p-3 rounded-md bg-red-50 text-red-500 text-sm flex items-start gap-x-2">
+          <div
+            className="p-3 rounded-md bg-red-50 text-red-500 text-sm flex items-start gap-x-2"
+            data-testid="form-error"
+          >
             <AlertCircle className="h-5 w-5 flex-shrink-0" />
             <div>{formState.errors._form[0]}</div>
           </div>
@@ -45,9 +48,10 @@ export function LoginForm() {
             className={formState.errors.email ? "border-red-500" : ""}
             defaultValue={formState.formValues?.email || ""}
             aria-describedby="email-error"
+            data-testid="email-input"
           />
           {formState.errors.email && (
-            <p id="email-error" className="text-sm text-red-500">
+            <p id="email-error" className="text-sm text-red-500" data-testid="email-error">
               {formState.errors.email[0]}
             </p>
           )}
@@ -56,7 +60,11 @@ export function LoginForm() {
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <Label htmlFor="password">Password</Label>
-            <Link href="/reset-password" className="text-sm font-medium text-primary hover:underline">
+            <Link
+              href="/reset-password"
+              className="text-sm font-medium text-primary hover:underline"
+              data-testid="forgot-password-link"
+            >
               Forgot your password?
             </Link>
           </div>
@@ -69,15 +77,21 @@ export function LoginForm() {
             className={formState.errors.password ? "border-red-500" : ""}
             defaultValue={formState.formValues?.password || ""}
             aria-describedby="password-error"
+            data-testid="password-input"
           />
           {formState.errors.password && (
-            <p id="password-error" className="text-sm text-red-500">
+            <p id="password-error" className="text-sm text-red-500" data-testid="password-error">
               {formState.errors.password[0]}
             </p>
           )}
         </div>
 
-        <Button type="submit" className="w-full bg-gray-900 text-white hover:bg-gray-800" disabled={isPending}>
+        <Button
+          type="submit"
+          className="w-full bg-gray-900 text-white hover:bg-gray-800"
+          disabled={isPending}
+          data-testid="login-button"
+        >
           {isPending ? "Signing in..." : "Sign in"}
         </Button>
       </form>
