@@ -50,6 +50,10 @@ export async function POST(request: Request) {
         transcript = await youtubeService.transcriptWithYoutubeTranscript(validatedData.source_youtube_url);
       }
 
+      if (transcript.length === 0) {
+        transcript = await youtubeService.transcriptWithScraper(validatedData.source_youtube_url);
+      }
+
       validatedData.source_text = transcript;
     }
 
