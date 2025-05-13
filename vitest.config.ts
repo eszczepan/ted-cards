@@ -11,7 +11,7 @@ export default defineConfig({
       reporter: ["text", "json", "html"],
       exclude: ["**/node_modules/**", "**/*.test.ts", "**/*.test.tsx"],
     },
-    setupFiles: ["./tests/setup.ts"],
+    setupFiles: ["./tests/unit/setup.ts"],
     include: ["tests/unit/**/*.test.{ts,tsx}"],
     exclude: ["tests/e2e/**/*"],
   },
