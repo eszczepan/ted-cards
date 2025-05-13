@@ -22,9 +22,9 @@ test.describe("TedCards Home Page", () => {
     await expect(page).toHaveURL(/.*signup/);
   });
 
-  test("allows navigation to signup page via get started button", async ({ page }) => {
+  test("allows navigation to dashboard via get started button @auth", async ({ page }) => {
     await homePage.clickGetStarted();
-    await expect(page).toHaveURL(/.*login/);
+    await expect(page).toHaveURL(/.*dashboard/);
   });
 
   test("allows navigation to signup page via try free button", async ({ page }) => {
