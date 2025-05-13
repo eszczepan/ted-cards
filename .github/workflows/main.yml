@@ -77,14 +77,34 @@ jobs:
           restore-keys: |
             playwright-
 
+      - name: Create test .env file
+        run: |
+          echo "NEXT_PUBLIC_SUPABASE_URL=${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}" > .env.local
+          echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}" >> .env.local
+
+      - name: Start Next.js app in background
+        run: npm run dev &
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+
+      - name: Wait for app to start
+        run: |
+          echo "Waiting for app to start..."
+          sleep 15
+          curl -s --retry 5 --retry-delay 2 --retry-connrefused http://localhost:3000 > /dev/null
+          echo "App is running"
+
       - name: Run E2E tests
         run: npx playwright install --with-deps && npm run test:e2e
         env:
           CI: true
+          BASE_URL: "http://localhost:3000"
           E2E_USERNAME_ID: ${{ secrets.E2E_USERNAME_ID }}
           E2E_USERNAME: ${{ secrets.E2E_USERNAME }}
           E2E_PASSWORD: ${{ secrets.E2E_PASSWORD }}
-          BASE_URL: ${{ secrets.BASE_URL || 'http://localhost:3000' }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
 
   build:
     name: Production Build
@@ -108,3 +128,5 @@ jobs:
         run: npm run build
         env:
           CI: true
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
