@@ -6,10 +6,10 @@ on:
   workflow_dispatch:
 
 jobs:
-  test-and-build:
+  lint:
+    name: Lint Check
     runs-on: ubuntu-latest
-    timeout-minutes: 15
-
+    timeout-minutes: 5
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -23,17 +23,53 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Lint
+      - name: Run lint
         run: npm run lint
         env:
           CI: true
+
+  test-unit:
+    name: Unit Tests
+    needs: lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
 
       - name: Run unit tests
         run: npm run test
         env:
           CI: true
 
-      - name: Setup Playwright
+  test-e2e:
+    name: E2E Tests
+    needs: lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Setup Playwright cache
         uses: actions/cache@v4
         with:
           path: ~/.cache/ms-playwright
@@ -45,6 +81,24 @@ jobs:
         run: npx playwright install --with-deps && npm run test:e2e
         env:
           CI: true
+
+  build:
+    name: Production Build
+    needs: [test-unit, test-e2e]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
 
       - name: Build production
         run: npm run build
