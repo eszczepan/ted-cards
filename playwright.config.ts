@@ -39,6 +39,7 @@ export default defineConfig({
       },
       dependencies: ["setup"],
       testMatch: /.*(test|spec)\.[jt]s/,
+      grep: /(Common Tests|@auth)/,
     },
     {
       name: "chromium-no-auth",

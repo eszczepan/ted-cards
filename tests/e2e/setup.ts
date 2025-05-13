@@ -31,6 +31,12 @@ setup("authenticate", async ({ page }) => {
 
   await page.goto(`${baseUrl}/login`);
 
+  if (page.url().includes("/dashboard")) {
+    console.log("Already logged in, skipping login process");
+    await page.context().storageState({ path: authFile });
+    return;
+  }
+
   await page.getByTestId("email-input").fill(username);
   await page.getByTestId("password-input").fill(password);
   await page.getByTestId("login-button").click();

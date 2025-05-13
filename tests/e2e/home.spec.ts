@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { HomePage } from "./models/HomePage";
 
-test.describe("TedCards Home Page", () => {
+test.describe("TedCards Home Page - Common Tests", () => {
   let homePage: HomePage;
 
   test.beforeEach(async ({ page }) => {
@@ -15,27 +15,6 @@ test.describe("TedCards Home Page", () => {
 
   test("should display all main page sections", async () => {
     await homePage.expectFullPageStructure();
-  });
-
-  test("allows navigation to signup page via signup button", async ({ page }) => {
-    await homePage.clickSignup();
-    await expect(page).toHaveURL(/.*signup/);
-  });
-
-  test("allows navigation to dashboard via get started button @auth", async ({ page }) => {
-    await homePage.clickGetStarted();
-    await expect(page).toHaveURL(/.*dashboard/);
-  });
-
-  test("allows navigation to signup page via try free button", async ({ page }) => {
-    await homePage.scrollToCta();
-    await homePage.clickTryFree();
-    await expect(page).toHaveURL(/.*signup/);
-  });
-
-  test("allows navigation to login page", async ({ page }) => {
-    await homePage.clickLogin();
-    await expect(page).toHaveURL(/.*login/);
   });
 
   test("has correct hero heading text", async () => {
@@ -80,5 +59,60 @@ test.describe("TedCards Home Page", () => {
   test("should take screenshot of hero section", async () => {
     await expect(homePage.heroSection).toBeVisible();
     await homePage.heroSection.screenshot({ path: "./test-results/hero-section.png" });
+  });
+});
+
+test.describe("TedCards Home Page - Non-Authenticated Users", () => {
+  let homePage: HomePage;
+
+  test.beforeEach(async ({ page }) => {
+    homePage = new HomePage(page);
+    await homePage.goto();
+  });
+
+  test("allows navigation to signup page via signup button", async ({ page }) => {
+    await homePage.clickSignup();
+    await expect(page).toHaveURL(/.*signup/);
+  });
+
+  test("allows navigation to signup page via try free button", async ({ page }) => {
+    await homePage.scrollToCta();
+    await homePage.clickTryFree();
+    await expect(page).toHaveURL(/.*signup/);
+  });
+
+  test("allows navigation to login page", async ({ page }) => {
+    await homePage.clickLogin();
+    await expect(page).toHaveURL(/.*login/);
+  });
+});
+
+test.describe("TedCards Home Page - Authenticated Users @auth", () => {
+  let homePage: HomePage;
+
+  test.beforeEach(async ({ page }) => {
+    homePage = new HomePage(page);
+    await homePage.goto();
+  });
+
+  test("redirects to dashboard from signup page", async ({ page }) => {
+    await homePage.clickSignup();
+    await expect(page).toHaveURL(/.*dashboard/);
+  });
+
+  test("allows navigation to dashboard via get started button", async ({ page }) => {
+    await homePage.clickGetStarted();
+    await expect(page).toHaveURL(/.*dashboard/);
+  });
+
+  test("redirects to dashboard from try free button", async ({ page }) => {
+    await homePage.scrollToCta();
+    await homePage.clickTryFree();
+    await expect(page).toHaveURL(/.*dashboard/);
+  });
+
+  test("redirects to dashboard from login page", async ({ page }) => {
+    await homePage.clickLogin();
+    await expect(page).toHaveURL(/.*dashboard/);
   });
 });

@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 import { LoginPage } from "./models/LoginPage";
 import { HomePage } from "./models/HomePage";
 
-test.describe("Login Flow", () => {
+test.describe("Login Flow for Non-Authenticated Users", () => {
   let loginPage: LoginPage;
   let homePage: HomePage;
 
@@ -54,6 +54,24 @@ test.describe("Login Flow", () => {
     await loginPage.goto();
     await loginPage.login(username, password);
 
+    await expect(page).toHaveURL(/.*dashboard/);
+  });
+});
+
+test.describe("Login Flow for Authenticated Users @auth", () => {
+  let loginPage: LoginPage;
+
+  test.beforeEach(async ({ page }) => {
+    loginPage = new LoginPage(page);
+  });
+
+  test("should redirect to dashboard when accessing login page", async ({ page }) => {
+    await loginPage.goto();
+    await expect(page).toHaveURL(/.*dashboard/);
+  });
+
+  test("should redirect to dashboard when trying to access signup from login page", async ({ page }) => {
+    await loginPage.goto();
     await expect(page).toHaveURL(/.*dashboard/);
   });
 });
