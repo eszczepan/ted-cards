@@ -1,21 +1,41 @@
-import { expect, test as base } from "@playwright/test";
-import { setupSupabaseMocks } from "./mocks/supabaseMock";
+import { test as setup, expect } from "@playwright/test";
+import path from "path";
+import fs from "fs";
 
-// Rozszerzamy test fixture, aby automatycznie dodać mocki dla Supabase
-export const test = base.extend({
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  page: async ({ page }, callback) => {
-    // Dodajemy mocki Supabase przed każdym testem
-    await setupSupabaseMocks(page);
+const authFile = path.join(__dirname, ".auth/user.json");
 
-    // Ignorujemy błędy nawigacji (np. gdy próbujemy przejść do /dashboard bez zalogowania)
-    page.on("pageerror", (error) => {
-      console.error(`Page error: ${error.message}`);
-      // Nie zatrzymujemy testów na błędach JavaScript
-    });
+setup.beforeAll(async () => {
+  try {
+    const dir = path.dirname(authFile);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
 
-    await callback(page);
-  },
+    if (fs.existsSync(authFile)) {
+      fs.unlinkSync(authFile);
+    }
+  } catch (error) {
+    console.error("Error cleaning up auth file:", error);
+  }
 });
 
-export { expect };
+setup("authenticate", async ({ page }) => {
+  const username = process.env.E2E_USERNAME;
+  const password = process.env.E2E_PASSWORD;
+
+  if (!username || !password) {
+    throw new Error("E2E_USERNAME and E2E_PASSWORD environment variables must be set for authentication tests");
+  }
+
+  const baseUrl = process.env.BASE_URL || "http://localhost:3000";
+
+  await page.goto(`${baseUrl}/login`);
+
+  await page.getByTestId("email-input").fill(username);
+  await page.getByTestId("password-input").fill(password);
+  await page.getByTestId("login-button").click();
+
+  await expect(page).toHaveURL(/\/dashboard/);
+
+  await page.context().storageState({ path: authFile });
+});
