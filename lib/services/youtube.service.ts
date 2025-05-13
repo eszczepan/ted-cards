@@ -7,6 +7,32 @@ type ParsedTextNode = {
 };
 
 export class YoutubeService {
+  async getTranscript(url: string): Promise<string> {
+    let transcript = "";
+    const methods = [
+      this.transcriptWithCaptionsScraper.bind(this),
+      this.transcriptWithYoutubeTranscript.bind(this),
+      this.transcriptWithScraper.bind(this),
+    ];
+
+    for (const method of methods) {
+      try {
+        transcript = await method(url);
+        if (transcript.length > 0) {
+          break;
+        }
+      } catch (error) {
+        console.error(`Method ${method.name} failed:`, error);
+      }
+    }
+
+    if (transcript.length === 0) {
+      throw new Error("Failed to get transcript from all available methods");
+    }
+
+    return transcript;
+  }
+
   async transcriptWithCaptionsScraper(url: string): Promise<string> {
     const videoId = this.extractVideoId(url);
 
