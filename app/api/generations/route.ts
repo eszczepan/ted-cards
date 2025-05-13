@@ -42,19 +42,30 @@ export async function POST(request: Request) {
 
     // 3. Use YoutubeService to get transcript
     if (validatedData.source_type === "youtube") {
-      let transcript = "";
-      const youtubeService = new YoutubeService();
-      // transcript = await youtubeService.transcriptWithCaptionsScraper(validatedData.source_youtube_url);
+      try {
+        let transcript = "";
+        const youtubeService = new YoutubeService();
+        transcript = await youtubeService.transcriptWithCaptionsScraper(validatedData.source_youtube_url);
 
-      // if (transcript.length === 0) {
-      //   transcript = await youtubeService.transcriptWithYoutubeTranscript(validatedData.source_youtube_url);
-      // }
+        if (transcript.length === 0) {
+          transcript = await youtubeService.transcriptWithYoutubeTranscript(validatedData.source_youtube_url);
+        }
 
-      // if (transcript.length === 0) {
-      transcript = await youtubeService.transcriptWithScraper(validatedData.source_youtube_url);
-      // }
+        if (transcript.length === 0) {
+          transcript = await youtubeService.transcriptWithScraper(validatedData.source_youtube_url);
+        }
 
-      validatedData.source_text = transcript;
+        validatedData.source_text = transcript;
+      } catch (error) {
+        console.error("Error getting transcript:", error);
+        return NextResponse.json(
+          {
+            error: "Failed to get transcript",
+            message: error instanceof Error ? error.message : "Unknown error",
+          },
+          { status: 500 }
+        );
+      }
     }
 
     // Ensure source_text is defined
