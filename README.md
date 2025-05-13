@@ -1,6 +1,6 @@
 # TedCards
 
-A web application that automatically generates educational flashcards from YouTube videos using artificial intelligence.
+A web application that automatically generates educational flashcards from YouTube videos and pasted Text using artificial intelligence.
 
 ## Table of Contents
 
