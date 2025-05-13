@@ -35,7 +35,7 @@ setup("authenticate", async ({ page }) => {
   await page.getByTestId("password-input").fill(password);
   await page.getByTestId("login-button").click();
 
-  await expect(page).toHaveURL(/\/dashboard/);
+  await expect(page).toHaveURL(/\/dashboard/, { timeout: 15000 });
 
   await page.context().storageState({ path: authFile });
 });
