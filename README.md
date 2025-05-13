@@ -148,6 +148,7 @@ Playwright is used for E2E testing with the following guidelines:
 - Use `expect(page).toHaveScreenshot()` for visual comparisons
 - Avoid flaky tests by ensuring proper wait conditions
 - Use isolated browser contexts for tests
+- Use shared authentication state for tests requiring login
 
 #### Setting Up E2E Tests
 
@@ -171,6 +172,39 @@ npm run test:e2e:ui       # Run tests with UI
 
 ```bash
 npm run test:e2e:report
+```
+
+#### Authentication in E2E Tests
+
+The project uses a shared authentication approach for tests:
+
+1. A special setup project (`setup.ts`) logs in once before all tests run
+2. The authentication state is saved to `tests/e2e/.auth/user.json`
+3. All tests that need authentication reuse this state, making tests faster and more reliable
+4. There's no need to log in manually in each test that requires authentication
+
+The project offers two testing modes:
+
+- **chromium** - uses shared authentication state for tests that need a logged-in user
+- **chromium-no-auth** - runs without authentication for tests that need a fresh, non-authenticated state
+
+Run tests with specific modes:
+
+```bash
+# Run all tests with authentication
+npx playwright test --project=chromium
+
+# Run all tests without authentication
+npx playwright test --project=chromium-no-auth
+
+# Run auth setup only
+npx playwright test setup.ts
+```
+
+To reset authentication state manually:
+
+```bash
+rm -rf tests/e2e/.auth
 ```
 
 ### Testing Best Practices
@@ -207,3 +241,36 @@ The project is currently in MVP stage and under active development.
 ## License
 
 [MIT License](LICENSE)
+
+## E2E Testing
+
+This project uses Playwright for end-to-end testing. To run the tests:
+
+```bash
+npm run test:e2e
+```
+
+### Environment Variables for Testing
+
+Create a `.env.local` file with the following variables for E2E tests:
+
+```
+# E2E Testing credentials
+E2E_USERNAME=test@test.com
+E2E_PASSWORD=your_test_password
+
+# Optional: Base URL for tests (defaults to http://localhost:3000)
+BASE_URL=http://localhost:3000
+```
+
+### Authentication in Tests
+
+Tests that require authentication should be tagged with `@auth`:
+
+```typescript
+test.describe("Dashboard tests @auth", () => {
+  // Tests here will run with authentication
+});
+```
+
+Tests without the `@auth` tag will run without authentication.
