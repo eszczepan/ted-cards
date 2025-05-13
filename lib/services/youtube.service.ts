@@ -65,7 +65,12 @@ export class YoutubeService {
     const videoUrl = `https://youtube.com/watch?v=${videoId}`;
 
     try {
-      const res = await fetch(videoUrl);
+      const res = await fetch(videoUrl, {
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+        },
+      });
       const pageSource = await res.text();
       const playerResponseMatch = pageSource.match(/var ytInitialPlayerResponse = (.*?);<\/script>/);
 
