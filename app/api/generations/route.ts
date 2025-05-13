@@ -44,15 +44,15 @@ export async function POST(request: Request) {
     if (validatedData.source_type === "youtube") {
       let transcript = "";
       const youtubeService = new YoutubeService();
-      transcript = await youtubeService.transcriptWithCaptionsScraper(validatedData.source_youtube_url);
+      // transcript = await youtubeService.transcriptWithCaptionsScraper(validatedData.source_youtube_url);
 
-      if (transcript.length === 0) {
-        transcript = await youtubeService.transcriptWithYoutubeTranscript(validatedData.source_youtube_url);
-      }
+      // if (transcript.length === 0) {
+      //   transcript = await youtubeService.transcriptWithYoutubeTranscript(validatedData.source_youtube_url);
+      // }
 
-      if (transcript.length === 0) {
-        transcript = await youtubeService.transcriptWithScraper(validatedData.source_youtube_url);
-      }
+      // if (transcript.length === 0) {
+      transcript = await youtubeService.transcriptWithScraper(validatedData.source_youtube_url);
+      // }
 
       validatedData.source_text = transcript;
     }
