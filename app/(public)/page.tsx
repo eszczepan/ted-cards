@@ -9,30 +9,33 @@ import { AnimatedHeading, AnimatedContainer, AnimatedCards, AnimatedCard } from 
 export default function Home() {
   return (
     <>
-      <header className="w-full fixed top-0 z-50 border-b bg-background/95 backdrop-blur">
+      <header className="w-full fixed top-0 z-50 border-b bg-background/95 backdrop-blur" data-testid="main-header">
         <div className="container max-w-screen-xl mx-auto flex items-center justify-between h-16 px-4 md:px-6">
-          <Link href="/" className="flex items-center gap-2 font-bold text-xl">
+          <Link href="/" className="flex items-center gap-2 font-bold text-xl" data-testid="logo">
             <span className="sr-only">TedCards</span>
             TedCards
           </Link>
           <div className="flex items-center gap-x-2">
-            <Link href="/login">
+            <Link href="/login" data-testid="login-button">
               <Button>Login</Button>
             </Link>
-            <Link href="/signup">
+            <Link href="/signup" data-testid="signup-button">
               <Button variant="outline">Sign Up</Button>
             </Link>
           </div>
         </div>
       </header>
       <div className="flex flex-col min-h-screen">
-        <section className="w-full mt-[64px] py-12 md:py-24 lg:py-32 xl:py-48 bg-blue-50">
+        <section className="w-full mt-[64px] py-12 md:py-24 lg:py-32 xl:py-48 bg-blue-50" data-testid="hero-section">
           <div className="container max-w-screen-xl mx-auto px-4 md:px-6 space-y-10 xl:space-y-16">
             <div className="grid gap-8 lg:grid-cols-[1fr_400px] lg:gap-12 xl:grid-cols-[1fr_600px]">
               <AnimatedContainer>
                 <div className="flex flex-col justify-center space-y-4">
                   <div className="space-y-2">
-                    <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl xl:text-6xl/none">
+                    <h1
+                      className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl xl:text-6xl/none"
+                      data-testid="hero-heading"
+                    >
                       Your AI-Powered Flashcard Generator
                     </h1>
                     <p className="max-w-[600px] text-gray-500 md:text-xl dark:text-gray-400">
@@ -50,7 +53,7 @@ export default function Home() {
                       ease: "easeOut",
                     }}
                   >
-                    <Link href="/dashboard">
+                    <Link href="/dashboard" data-testid="get-started-button">
                       <Button size="lg" className="w-full">
                         Try TedCards Free
                       </Button>
@@ -131,7 +134,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="w-full py-12 md:py-24 bg-white">
+        <section className="w-full py-12 md:py-24 bg-white" data-testid="feature-section">
           <div className="container max-w-screen-xl mx-auto px-4 md:px-6">
             <AnimatedHeading>
               <div className="flex flex-col items-center justify-center space-y-4 text-center">
@@ -255,7 +258,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="w-full py-12 md:py-24 bg-gray-50">
+        <section className="w-full py-12 md:py-24 bg-gray-50" data-testid="how-it-works-section">
           <div className="container max-w-screen-xl mx-auto px-4 md:px-6">
             <AnimatedHeading>
               <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
@@ -470,7 +473,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="w-full py-12 md:py-24 relative overflow-hidden">
+        <section className="w-full py-12 md:py-24 relative overflow-hidden" data-testid="testimonial-section">
           <div className="container max-w-screen-xl mx-auto px-4 md:px-6">
             <AnimatedHeading>
               <div className="flex flex-col items-center justify-center space-y-4 text-center mb-16">
@@ -854,7 +857,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="w-full pb-16 md:pb-24">
+        <section className="w-full pb-16 md:pb-24" data-testid="cta-section">
           <div className="container max-w-screen-xl mx-auto px-4 md:px-6 py-12 md:py-24">
             <div className="mx-auto bg-gradient-to-r from-blue-100 to-indigo-100 rounded-3xl shadow-lg overflow-hidden">
               <div className="px-8 py-12 md:py-16">
@@ -867,7 +870,7 @@ export default function Home() {
                       Join thousands of knowledge enthusiasts already using TedCards to enhance their learning and
                       productivity.
                     </p>
-                    <Link href="/signup">
+                    <Link href="/signup" data-testid="try-free-button">
                       <Button size="lg" className="bg-blue-600 text-white hover:bg-blue-700">
                         Try TedCards Free
                       </Button>
@@ -879,7 +882,7 @@ export default function Home() {
           </div>
         </section>
 
-        <footer className="w-full py-8 bg-gray-100">
+        <footer className="w-full py-8 bg-gray-100" data-testid="footer">
           <div className="container max-w-screen-xl mx-auto px-4 md:px-6">
             <div className="flex flex-col md:flex-row justify-between items-center">
               <div>
