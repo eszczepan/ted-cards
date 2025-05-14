@@ -99,7 +99,9 @@ export class YoutubeService {
       }
 
       try {
+        console.log("First element of playerResponseMatch:", playerResponseMatch[1]);
         const playerResponse = JSON.parse(playerResponseMatch[1]);
+        console.log("playerResponse:", playerResponse);
         const captionTracks = playerResponse?.captions?.playerCaptionsTracklistRenderer?.captionTracks;
         console.log("captionTracks:", captionTracks);
 
