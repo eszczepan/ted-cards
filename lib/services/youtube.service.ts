@@ -1,6 +1,7 @@
 import { YoutubeTranscript } from "youtube-transcript";
 import { getSubtitles } from "youtube-captions-scraper";
 import TranscriptAPI from "youtube-transcript-api";
+import { YtTranscript } from "yt-transcript";
 import { XMLParser } from "fast-xml-parser";
 
 type ParsedTextNode = {
@@ -13,7 +14,8 @@ export class YoutubeService {
     const methods = [
       // this.transcriptWithCaptionsScraper.bind(this),
       // this.transcriptWithYoutubeTranscript.bind(this),
-      this.transcriptWithScraper.bind(this),
+      // this.transcriptWithScraper.bind(this),
+      this.transcriptWithYtTranscript.bind(this),
       // this.transcriptWithYoutubeTranscriptApi.bind(this),
     ];
 
@@ -47,8 +49,9 @@ export class YoutubeService {
       lang: "en",
     });
     const text = subtitles.map((s) => s.text).join(" ");
+    const cleanedText = this.cleanTranscript(text).slice(0, 15000);
 
-    return this.cleanTranscript(text).slice(0, 15000);
+    return cleanedText;
   }
 
   async transcriptWithYoutubeTranscript(url: string): Promise<string> {
@@ -56,6 +59,25 @@ export class YoutubeService {
     const text = transcript.map((t) => t.text).join(" ");
 
     return this.cleanTranscript(text).slice(0, 15000);
+  }
+
+  async transcriptWithYtTranscript(url: string): Promise<string> {
+    const videoId = this.extractVideoId(url);
+
+    if (!videoId) {
+      throw new Error("Invalid YouTube URL");
+    }
+
+    const transcript = new YtTranscript({ videoId });
+    const transcriptText = await transcript.getTranscript("en");
+
+    if (!transcriptText) {
+      throw new Error("Failed to get transcript from YtTranscript");
+    }
+
+    const cleanedText = this.cleanTranscript(transcriptText.map((t) => t.text).join(" ")).slice(0, 15000);
+
+    return cleanedText;
   }
 
   async transcriptWithYoutubeTranscriptApi(url: string): Promise<string> {
@@ -67,8 +89,9 @@ export class YoutubeService {
 
     const transcript = await TranscriptAPI.getTranscript(videoId);
     const text = transcript.map((t: { text: string }) => t.text).join(" ");
+    const cleanedText = this.cleanTranscript(text).slice(0, 15000);
 
-    return this.cleanTranscript(text).slice(0, 15000);
+    return cleanedText;
   }
 
   async transcriptWithScraper(url: string): Promise<string> {
@@ -193,6 +216,7 @@ export class YoutubeService {
       .replace(/\d{2}:\d{2}/g, "") // Remove timestamps
       .replace(/\n+/g, " ") // Replace newlines with spaces
       .replace(/\s+/g, " ") // Replace multiple spaces with single space
+      .replace(/&#39;s/g, "'s") // Replace &#39;s with 's
       .trim();
   }
 }
