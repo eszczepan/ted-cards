@@ -29,6 +29,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "fast-xml-parser": "^5.2.3",
+    "https-proxy-agent": "^7.0.6",
     "lucide-react": "^0.488.0",
     "motion": "^12.7.3",
     "next": "15.3.0",

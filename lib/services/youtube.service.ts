@@ -4,6 +4,7 @@ import TranscriptAPI from "youtube-transcript-api";
 import { YtTranscript } from "yt-transcript";
 import { fetchTranscript as fetchTranscriptPlus } from "youtube-transcript-plus";
 import { XMLParser } from "fast-xml-parser";
+import { HttpsProxyAgent } from "https-proxy-agent";
 
 type ParsedTextNode = {
   _text?: string;
@@ -46,9 +47,23 @@ export class YoutubeService {
       throw new Error("Invalid YouTube URL");
     }
 
+    const proxy = await this.getProxy();
+    console.log(proxy);
+
     const transcript = await fetchTranscriptPlus(videoId, {
       disableHttps: true,
+      transcriptFetch: async ({ url, lang, userAgent }) => {
+        return fetch(url, {
+          headers: {
+            ...(lang ? { "Accept-Language": lang } : {}),
+            "User-Agent": userAgent || "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+          },
+          // @ts-expect-error - Node.js fetch agent property
+          agent: new HttpsProxyAgent(proxy),
+        });
+      },
     });
+
     const text = transcript.map((t) => t.text).join(" ");
     const cleanedText = this.cleanTranscript(text).slice(0, 15000);
 
@@ -155,5 +170,15 @@ export class YoutubeService {
       .replace(/\s+/g, " ") // Replace multiple spaces with single space
       .replace(/&#39;s/g, "'s") // Replace &#39;s with 's
       .trim();
+  }
+
+  private async getProxy(): Promise<string> {
+    const proxyList = await fetch("https://raw.githubusercontent.com/TheSpeedX/PROXY-List/master/http.txt");
+    const proxyListText = await proxyList.text();
+    const proxies = proxyListText.split("\n").filter((p) => p.trim());
+    const randomProxy = proxies[Math.floor(Math.random() * proxies.length)];
+
+    // Dodanie prefixu protokołu HTTP
+    return `http://${randomProxy}`;
   }
 }
