@@ -10,8 +10,8 @@ export class YoutubeService {
   async getTranscript(url: string): Promise<string> {
     let transcript = "";
     const methods = [
-      // this.transcriptWithCaptionsScraper.bind(this),
-      // this.transcriptWithYoutubeTranscript.bind(this),
+      this.transcriptWithCaptionsScraper.bind(this),
+      this.transcriptWithYoutubeTranscript.bind(this),
       this.transcriptWithScraper.bind(this),
     ];
 
