@@ -2,7 +2,6 @@ import { YoutubeTranscript } from "youtube-transcript";
 import { getSubtitles } from "youtube-captions-scraper";
 import TranscriptAPI from "youtube-transcript-api";
 import { YtTranscript } from "yt-transcript";
-import { fetchTranscript as fetchTranscriptPlus } from "youtube-transcript-plus";
 import { XMLParser } from "fast-xml-parser";
 
 type ParsedTextNode = {
@@ -13,12 +12,11 @@ export class YoutubeService {
   async getTranscript(url: string): Promise<string> {
     let transcript = "";
     const methods = [
-      // this.transcriptWithScraper.bind(this),
-      // this.transcriptWithCaptionsScraper.bind(this),
-      // this.transcriptWithYoutubeTranscript.bind(this),
-      // this.transcriptWithYtTranscript.bind(this),
-      // this.transcriptWithYoutubeTranscriptApi.bind(this),
-      this.transcriptWithYoutubeTranscriptPlus.bind(this),
+      this.transcriptWithScraper.bind(this),
+      this.transcriptWithCaptionsScraper.bind(this),
+      this.transcriptWithYoutubeTranscript.bind(this),
+      this.transcriptWithYtTranscript.bind(this),
+      this.transcriptWithYoutubeTranscriptApi.bind(this),
     ];
 
     for (const method of methods) {
@@ -37,54 +35,6 @@ export class YoutubeService {
     }
 
     return transcript;
-  }
-
-  async transcriptWithYoutubeTranscriptPlus(url: string): Promise<string> {
-    try {
-      const videoId = this.extractVideoId(url);
-
-      if (!videoId) {
-        throw new Error("Invalid YouTube URL");
-      }
-
-      // Próba pobrania transkrypcji bez proxy
-      try {
-        const transcript = await fetchTranscriptPlus(videoId, {
-          disableHttps: true,
-        });
-
-        console.log("Transcript retrieved successfully");
-        const text = transcript.map((t) => t.text).join(" ");
-        const cleanedText = this.cleanTranscript(text).slice(0, 15000);
-        return cleanedText;
-      } catch (error) {
-        console.error("Error getting transcript without proxy:", error);
-
-        // Jeśli nie udało się bez proxy, próbujemy z proxy
-        const proxy = await this.getProxy();
-        console.log("Using proxy:", proxy);
-
-        const transcript = await fetchTranscriptPlus(videoId, {
-          disableHttps: true,
-          transcriptFetch: async ({ url: transcriptUrl, lang, userAgent }) => {
-            console.log("Fetching transcript from:", transcriptUrl);
-            return fetch(transcriptUrl, {
-              headers: {
-                ...(lang && { "Accept-Language": lang }),
-                "User-Agent": userAgent || "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
-              },
-            });
-          },
-        });
-
-        const text = transcript.map((t) => t.text).join(" ");
-        const cleanedText = this.cleanTranscript(text).slice(0, 15000);
-        return cleanedText;
-      }
-    } catch (error) {
-      console.error("Error in transcriptWithYoutubeTranscriptPlus:", error);
-      throw error;
-    }
   }
 
   async transcriptWithCaptionsScraper(url: string): Promise<string> {
@@ -185,41 +135,5 @@ export class YoutubeService {
       .replace(/\s+/g, " ") // Replace multiple spaces with single space
       .replace(/&#39;s/g, "'s") // Replace &#39;s with 's
       .trim();
-  }
-
-  private async getProxy(): Promise<string> {
-    try {
-      const proxyList = await fetch(
-        "https://proxylist.geonode.com/api/proxy-list?protocols=http&speed=fast&limit=500&page=1&sort_by=lastChecked&sort_type=desc"
-      );
-      const proxyListJson = await proxyList.json();
-
-      // Upewnij się, że mamy dostęp do danych proxy
-      if (!proxyListJson?.data || !Array.isArray(proxyListJson.data) || proxyListJson.data.length === 0) {
-        throw new Error("No proxy data available");
-      }
-
-      // Definiowanie typu dla danych proxy
-      interface ProxyData {
-        ip: string;
-        port: string | number;
-      }
-
-      // Formatujemy poprawnie proxy - potrzebujemy IP i port
-      const proxies = proxyListJson.data
-        .filter((p: ProxyData) => p && p.ip && p.port)
-        .map((p: ProxyData) => `http://${p.ip}:${p.port}`);
-
-      if (proxies.length === 0) {
-        throw new Error("No valid proxies found");
-      }
-
-      const randomProxy = proxies[Math.floor(Math.random() * proxies.length)];
-      return randomProxy;
-    } catch (error) {
-      console.error("Error getting proxy:", error);
-      // Fallback to default proxy if available
-      return "http://localhost:8080";
-    }
   }
 }
