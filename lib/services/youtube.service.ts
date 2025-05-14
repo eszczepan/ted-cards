@@ -2,6 +2,7 @@ import { YoutubeTranscript } from "youtube-transcript";
 import { getSubtitles } from "youtube-captions-scraper";
 import TranscriptAPI from "youtube-transcript-api";
 import { YtTranscript } from "yt-transcript";
+import { fetchTranscript as fetchTranscriptPlus } from "youtube-transcript-plus";
 import { XMLParser } from "fast-xml-parser";
 
 type ParsedTextNode = {
@@ -12,11 +13,12 @@ export class YoutubeService {
   async getTranscript(url: string): Promise<string> {
     let transcript = "";
     const methods = [
-      this.transcriptWithScraper.bind(this),
-      this.transcriptWithCaptionsScraper.bind(this),
-      this.transcriptWithYoutubeTranscript.bind(this),
-      this.transcriptWithYtTranscript.bind(this),
-      this.transcriptWithYoutubeTranscriptApi.bind(this),
+      // this.transcriptWithScraper.bind(this),
+      // this.transcriptWithCaptionsScraper.bind(this),
+      // this.transcriptWithYoutubeTranscript.bind(this),
+      // this.transcriptWithYtTranscript.bind(this),
+      // this.transcriptWithYoutubeTranscriptApi.bind(this),
+      this.transcriptWithYoutubeTranscriptPlus.bind(this),
     ];
 
     for (const method of methods) {
@@ -35,6 +37,22 @@ export class YoutubeService {
     }
 
     return transcript;
+  }
+
+  async transcriptWithYoutubeTranscriptPlus(url: string): Promise<string> {
+    const videoId = this.extractVideoId(url);
+
+    if (!videoId) {
+      throw new Error("Invalid YouTube URL");
+    }
+
+    const transcript = await fetchTranscriptPlus(videoId);
+    const text = transcript.map((t) => t.text).join(" ");
+    const cleanedText = this.cleanTranscript(text).slice(0, 15000);
+
+    console.log(cleanedText);
+
+    return cleanedText;
   }
 
   async transcriptWithCaptionsScraper(url: string): Promise<string> {
