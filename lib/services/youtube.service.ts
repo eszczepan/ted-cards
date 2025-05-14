@@ -46,7 +46,9 @@ export class YoutubeService {
       throw new Error("Invalid YouTube URL");
     }
 
-    const transcript = await fetchTranscriptPlus(videoId);
+    const transcript = await fetchTranscriptPlus(videoId, {
+      disableHttps: true,
+    });
     const text = transcript.map((t) => t.text).join(" ");
     const cleanedText = this.cleanTranscript(text).slice(0, 15000);
 
