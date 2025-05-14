@@ -40,6 +40,7 @@
     "uuid": "^11.1.0",
     "youtube-captions-scraper": "^2.0.3",
     "youtube-transcript": "^1.2.1",
+    "youtube-transcript-api": "^2.0.4",
     "zod": "^3.24.3"
   },
   "devDependencies": {

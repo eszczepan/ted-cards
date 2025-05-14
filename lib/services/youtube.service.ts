@@ -1,5 +1,6 @@
 import { YoutubeTranscript } from "youtube-transcript";
 import { getSubtitles } from "youtube-captions-scraper";
+import TranscriptAPI from "youtube-transcript-api";
 import { XMLParser } from "fast-xml-parser";
 
 type ParsedTextNode = {
@@ -12,6 +13,7 @@ export class YoutubeService {
     const methods = [
       this.transcriptWithCaptionsScraper.bind(this),
       this.transcriptWithYoutubeTranscript.bind(this),
+      this.transcriptWithYoutubeTranscriptApi.bind(this),
       this.transcriptWithScraper.bind(this),
     ];
 
@@ -52,6 +54,21 @@ export class YoutubeService {
   async transcriptWithYoutubeTranscript(url: string): Promise<string> {
     const transcript = await YoutubeTranscript.fetchTranscript(url);
     const text = transcript.map((t) => t.text).join(" ");
+
+    return this.cleanTranscript(text).slice(0, 15000);
+  }
+
+  async transcriptWithYoutubeTranscriptApi(url: string): Promise<string> {
+    const videoId = this.extractVideoId(url);
+
+    console.log("videoId", videoId);
+
+    if (!videoId) {
+      throw new Error("Invalid YouTube URL");
+    }
+
+    const transcript = await TranscriptAPI.getTranscript(videoId);
+    const text = transcript.map((t: { text: string }) => t.text).join(" ");
 
     return this.cleanTranscript(text).slice(0, 15000);
   }
