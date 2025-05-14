@@ -69,7 +69,14 @@ export class YoutubeService {
     }
 
     const transcript = new YtTranscript({ videoId });
+    const transcriptList = await transcript.listAllTranscripts();
+    console.log("List of transcripts:", transcriptList);
+
+    const transcriptByLanguage = await transcript.getTranscriptByLanguage("en");
+    console.log("Transcript by language:", transcriptByLanguage);
+
     const transcriptText = await transcript.getTranscript("en");
+    console.log("Transcript text:", transcriptText);
 
     if (!transcriptText) {
       throw new Error("Failed to get transcript from YtTranscript");
