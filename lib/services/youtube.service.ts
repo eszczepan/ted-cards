@@ -13,8 +13,8 @@ export class YoutubeService {
     const methods = [
       this.transcriptWithCaptionsScraper.bind(this),
       this.transcriptWithYoutubeTranscript.bind(this),
-      this.transcriptWithYoutubeTranscriptApi.bind(this),
       this.transcriptWithScraper.bind(this),
+      this.transcriptWithYoutubeTranscriptApi.bind(this),
     ];
 
     for (const method of methods) {
@@ -29,7 +29,7 @@ export class YoutubeService {
     }
 
     if (transcript.length === 0) {
-      throw new Error("Failed to get transcript from all available methods");
+      throw new Error(`Failed to get transcript from all available ${methods.length} methods`);
     }
 
     return transcript;
@@ -60,8 +60,6 @@ export class YoutubeService {
 
   async transcriptWithYoutubeTranscriptApi(url: string): Promise<string> {
     const videoId = this.extractVideoId(url);
-
-    console.log("videoId", videoId);
 
     if (!videoId) {
       throw new Error("Invalid YouTube URL");
@@ -101,6 +99,7 @@ export class YoutubeService {
       try {
         const playerResponse = JSON.parse(playerResponseMatch[1]);
         const captionTracks = playerResponse?.captions?.playerCaptionsTracklistRenderer?.captionTracks;
+        console.log("captionTracks:", captionTracks);
 
         if (!captionTracks || captionTracks.length === 0) {
           throw new Error("No captions available");
@@ -110,6 +109,7 @@ export class YoutubeService {
 
         const transcriptRes = await fetch(transcriptUrl);
         const transcriptXml = await transcriptRes.text();
+        console.log("transcriptXml:", transcriptXml);
         const parser = new XMLParser({ ignoreAttributes: false, textNodeName: "_text" });
         const parsedXml = parser.parse(transcriptXml);
 
