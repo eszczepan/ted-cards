@@ -92,6 +92,8 @@ export class YoutubeService {
       const playerResponseRegex = /ytInitialPlayerResponse\s*=\s*({.+?})(?=;)/;
       const playerResponseMatch = pageSource.match(playerResponseRegex);
 
+      console.log("playerResponseMatch:", playerResponseMatch);
+
       if (!playerResponseMatch || !playerResponseMatch[1]) {
         throw new Error("Player response not found");
       }
