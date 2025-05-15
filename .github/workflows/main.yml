@@ -51,7 +51,7 @@ jobs:
     name: Deploy to Netlify
     needs: [lint, test-unit]
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -67,17 +67,15 @@ jobs:
 
       - name: Build project
         run: npm run build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
 
       - name: Deploy to Netlify
-        uses: nwtgck/actions-netlify@v3.0
-        with:
-          publish-dir: ".next"
-          production-branch: main
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          deploy-message: "Deploy from GitHub Actions: ${{ github.sha }}"
+        run: |
+          npx netlify-cli deploy --dir=.next --prod --message="Deploy from GitHub Actions: ${{ github.sha }}"
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
