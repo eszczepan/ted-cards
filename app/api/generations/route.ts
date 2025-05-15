@@ -49,7 +49,7 @@ export async function POST(request: Request) {
         console.error("Error getting transcript:", error);
         return NextResponse.json(
           {
-            error: "Failed to get transcript",
+            error: "We cannot get the transcript from this video. Please try another one.",
             message: error instanceof Error ? error.message : "Unknown error",
           },
           { status: 500 }
@@ -71,7 +71,6 @@ export async function POST(request: Request) {
     try {
       // 4. Use GenerationService to generate flashcards
       const generationService = new GenerationService();
-      // Generate flashcard proposals
       const generationResult = await generationService.generateFlashcards(user_id, {
         source_type: validatedData.source_type,
         source_text: validatedData.source_text,
