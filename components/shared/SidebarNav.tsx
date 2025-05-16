@@ -12,6 +12,8 @@ import {
 } from "../ui/sidebar";
 import { logout } from "@/lib/actions/auth.actions";
 import { Button } from "@/components/ui/button";
+import { InlineAlert } from "@/components/shared/InlineAlert";
+import { createClient } from "@/supabase/supabase.server";
 
 const items = [
   {
@@ -54,9 +56,21 @@ const helpItems = [
   },
 ];
 
-export function SidebarNav() {
+export async function SidebarNav() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const isTestAccount = user?.email?.endsWith("@test.com") || false;
+
   return (
     <Sidebar>
+      {isTestAccount && (
+        <div className="px-4 pt-3">
+          <InlineAlert message="This is a test account, only for demo purposes." variant="info" />
+        </div>
+      )}
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Ted Cards</SidebarGroupLabel>
