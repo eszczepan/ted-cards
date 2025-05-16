@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "@/styles/globals.css";
 import { SidebarNav } from "@/components/shared/SidebarNav";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { Footer } from "@/components/shared/Footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,12 +32,10 @@ export default function DashboardLayout({
           <SidebarNav />
           <SidebarTrigger />
           <div className="flex flex-col w-full pr-7">
-            <main className="flex flex-col gap-8 max-w-5xl mx-auto w-full font-[family-name:var(--font-geist-sans)]">
+            <main className="flex flex-col gap-8 max-w-5xl mx-auto w-full min-h-[90vh] font-[family-name:var(--font-geist-sans)]">
               {children}
             </main>
-            <footer className="text-center text-sm text-muted-foreground py-4 mt-8 max-w-5xl mx-auto w-full">
-              Ted Cards - 2025
-            </footer>
+            <Footer />
           </div>
         </SidebarProvider>
       </body>

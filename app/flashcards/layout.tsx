@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "@/styles/globals.css";
 import { SidebarNav } from "@/components/shared/SidebarNav";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-
+import { Footer } from "@/components/shared/Footer";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -32,11 +32,9 @@ export default function FlashcardsLayout({
           <SidebarTrigger />
           <div className="flex flex-col w-full pr-7">
             <main className="flex flex-col gap-8 max-w-5xl mx-auto w-full font-[family-name:var(--font-geist-sans)]">
-              <div className="container mx-auto py-8 min-h-[calc(100vh)]">{children}</div>
+              <div className="container mx-auto py-8 min-h-[92vh]">{children}</div>
             </main>
-            <footer className="text-center text-sm text-muted-foreground py-4 mt-8 max-w-5xl mx-auto w-full">
-              TedCards - 2025
-            </footer>
+            <Footer />
           </div>
         </SidebarProvider>
       </body>
