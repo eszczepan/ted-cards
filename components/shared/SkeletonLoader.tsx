@@ -1,5 +1,5 @@
 import { Skeleton } from "@/components/ui/skeleton";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/index";
 
 type SkeletonLoaderProps = {
   count?: number;
@@ -18,7 +18,7 @@ export function SkeletonLoader({ count = 3, height = 80, width = "100%", classNa
             "rounded-lg",
             typeof height === "number" ? `h-[${height}px]` : `h-${height}`,
             typeof width === "number" ? `w-[${width}px]` : `w-${width}`,
-            className,
+            className
           )}
         />
       ))}
