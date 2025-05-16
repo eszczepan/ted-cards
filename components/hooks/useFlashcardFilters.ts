@@ -25,7 +25,6 @@ function useFlashcardFilters(): UseFlashcardFiltersReturnType {
   const pathname = usePathname();
   const router = useRouter();
 
-  // Parse initial state from URL query parameters
   const initialSearchTerm = searchParams.get("search") || "";
   const initialPage = parseInt(searchParams.get("page") || "1", 12);
   const initialLimit = parseInt(searchParams.get("limit") || "12", 12);
@@ -33,7 +32,6 @@ function useFlashcardFilters(): UseFlashcardFiltersReturnType {
   const initialSortBy = (searchParams.get("sort_by") || "created_at") as "created_at" | "cefr_level" | "front_content";
   const initialSortOrder = (searchParams.get("sort_order") || "desc") as "asc" | "desc";
 
-  // Set up local state
   const [searchTerm, setSearchTermState] = useState<string>(initialSearchTerm);
   const [page, setPageState] = useState<number>(initialPage);
   const [limit] = useState<number>(initialLimit);
@@ -75,10 +73,8 @@ function useFlashcardFilters(): UseFlashcardFiltersReturnType {
     router.push(url);
   }, [pathname, router, searchTerm, page, limit, filters]);
 
-  // Debounce URL updates to avoid excessive history entries
   const debouncedUpdateUrl = useCallback(debounce(updateUrl, 300), [updateUrl]);
 
-  // Trigger URL update when filters change
   useEffect(() => {
     debouncedUpdateUrl();
   }, [searchTerm, page, filters, debouncedUpdateUrl]);
