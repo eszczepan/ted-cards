@@ -2,26 +2,32 @@
 
 ## 1. Przegląd produktu
 
-TedCards to aplikacja webowa, której kluczową funkcjonalnością jest automatyczne generowanie fiszek edukacyjnych z napisów pobranych z filmów YouTube. System integruje mechanizm przetwarzania napisów oraz generowania treści fiszek za pomocą AI, umożliwiając użytkownikom szybką naukę nowych słówek w kontekście zdań i przykładów. Aplikacja obsługuje języki polski i angielski. Ponadto, użytkownik ma możliwość manualnego tworzenia fiszek, co pozwala na pełną personalizację nauki.
+TedCards to aplikacja webowa, której kluczową funkcjonalnością jest automatyczne generowanie fiszek edukacyjnych z dwóch trybów: napisów pobranych z filmów YouTube oraz z wprowadzonego tekstu.
+
+Użytkownik ma możliwość manualnego tworzenia fiszek, co pozwala na pełną personalizację nauki.
+
+Aplikacja obsługuje języki polski i angielski.
 
 ## 2. Problem użytkownika
 
-Użytkownicy często napotykają na problem czasochłonności i dezorientacji przy ręcznym tworzeniu wysokiej jakości fiszek edukacyjnych. Proces ten wymaga starannego doboru treści, poprawnego formatu oraz zapewnienia przykładu użycia słów, co znacząco obciąża czas i energię. Dodatkowo, brak automatyzacji w generowaniu treści powoduje, że nauka języka staje się mniej efektywna i mało atrakcyjna.
+Użytkownicy często napotykają na problem czasochłonności i dezorientacji przy ręcznym tworzeniu wysokiej jakości fiszek edukacyjnych. Proces ten wymaga starannego doboru treści, poprawnego formatu oraz zapewnienia przykładu użycia słów, co znacząco obciąża czas i energię.
+
+Dodatkowo, brak automatyzacji w generowaniu treści powoduje, że nauka języka staje się mniej efektywna i mało atrakcyjna.
 
 ## 3. Wymagania funkcjonalne
 
 1. Automatyczne generowanie fiszek:
 
-- Pobieranie napisów z YouTube z limitem do 15000 znaków oraz walidacja długości.
+- Pobieranie napisów z YouTube lub pobranie wprowadzonego tekstu przez uytkownika.
 - Automatyczne generowanie fiszek przez AI na podstawie pobranych napisów, przy czym:
-  - Pole "przód" zawiera słowo w znanym języku (do 200 znaków).
+  - Pole "przód" zawiera słowo lub kolokacje w znanym języku (do 200 znaków).
   - Pole "tył" zawiera rozbudowaną odpowiedź z przykładem użycia (do 500 znaków).
 - Automatyczna ocena poziomu CEFR dla każdej fiszki z możliwością edycji przez użytkownika poprzez dropdown (opcje: A1, A2, B1, B2, C1, C2).
 - Interfejs umożliwiający interakcję z generowanymi fiszkami poprzez przyciski "zaakceptuj", "edytuj" oraz "odrzuć".
 - Bulkowy zapis decyzji użytkownika – zaakceptowane fiszki trafiają do bazy danych.
 - Rejestrowanie logów statusów akceptacji fiszek w dedykowanej tabeli bazy danych.
 - Wielowarstwowa walidacja danych (frontend, backend, baza) z informacyjnymi alertami w przypadku błędów.
-- Fiszki mogą być generowane z dwóch źródeł: YouTube link lub tekst wklejony przez użytkownika.
+- Fiszki mogą być generowane z dwóch źródeł: YouTube link lub tekst wprowadzony przez użytkownika.
 
 2. Ręcznie tworzenie i zarządzanie fiszkami:
 
