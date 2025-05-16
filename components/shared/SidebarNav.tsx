@@ -1,4 +1,4 @@
-import { Brain, FileText, HelpCircle, Home, LogOut, Send, Settings } from "lucide-react";
+import { Brain, FileText, HelpCircle, Home, LogOut, Send, Settings, GlobeLock } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -50,7 +50,7 @@ const helpItems = [
   {
     title: "Privacy Policy",
     url: "/privacy",
-    icon: FileText,
+    icon: GlobeLock,
   },
 ];
 
