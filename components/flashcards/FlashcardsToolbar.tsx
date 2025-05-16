@@ -4,28 +4,64 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CefrLevel, CEFR_LEVEL, FlashcardFilterParams } from "@/types";
+import { CefrLevel, CEFR_LEVEL, FlashcardFilterParams, FlashcardsPageParams } from "@/types";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface FlashcardsToolbarProps {
   onSearchChange: (term: string) => void;
   onFilterChange: (filters: FlashcardFilterParams) => void;
+  onReset?: (params: FlashcardsPageParams) => void;
+  searchValue?: string;
+  isInitialLoading?: boolean;
+  currentFilters?: FlashcardsPageParams;
 }
 
-export default function FlashcardsToolbar({ onSearchChange, onFilterChange }: FlashcardsToolbarProps) {
+const DEFAULT_FILTERS = {
+  sort_by: "created_at" as const,
+  sort_order: "desc" as const,
+  searchTerm: "",
+  page: 1,
+  limit: 10,
+  cefr_level: undefined,
+};
+
+function areFiltersDefault(currentFilters?: FlashcardsPageParams): boolean {
+  if (!currentFilters) return false;
+
+  return (
+    currentFilters.sort_by === DEFAULT_FILTERS.sort_by &&
+    currentFilters.sort_order === DEFAULT_FILTERS.sort_order &&
+    (!currentFilters.searchTerm || currentFilters.searchTerm === "") &&
+    currentFilters.page === DEFAULT_FILTERS.page &&
+    currentFilters.cefr_level === DEFAULT_FILTERS.cefr_level
+  );
+}
+
+export default function FlashcardsToolbar({
+  onSearchChange,
+  onFilterChange,
+  onReset,
+  searchValue,
+  isInitialLoading = false,
+  currentFilters,
+}: FlashcardsToolbarProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [filters, setFilters] = useState<FlashcardFilterParams>({
     sort_by: "created_at",
     sort_order: "desc",
   });
 
+  const displaySearchTerm = searchValue !== undefined ? searchValue : searchTerm;
+
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setSearchTerm(value);
+    if (searchValue === undefined) {
+      setSearchTerm(value);
+    }
     onSearchChange(value);
   };
 
   const handleCefrLevelChange = (value: string) => {
-    // If value is 'all', set cefr_level to undefined
     const cefrLevel = value === "all" ? undefined : (value as CefrLevel);
     const newFilters = { ...filters, cefr_level: cefrLevel };
     setFilters(newFilters);
@@ -45,25 +81,38 @@ export default function FlashcardsToolbar({ onSearchChange, onFilterChange }: Fl
   };
 
   const handleResetFilters = () => {
-    const defaultFilters = {
-      sort_by: "created_at" as const,
-      sort_order: "desc" as const,
-    };
-    setFilters(defaultFilters);
-    onFilterChange(defaultFilters);
-    setSearchTerm("");
-    onSearchChange("");
+    if (areFiltersDefault(currentFilters)) {
+      return;
+    }
+
+    setFilters({
+      sort_by: DEFAULT_FILTERS.sort_by,
+      sort_order: DEFAULT_FILTERS.sort_order,
+    });
+
+    if (searchValue === undefined) {
+      setSearchTerm("");
+    }
+
+    if (onReset) {
+      onReset(DEFAULT_FILTERS);
+    } else {
+      onFilterChange({
+        sort_by: DEFAULT_FILTERS.sort_by,
+        sort_order: DEFAULT_FILTERS.sort_order,
+      });
+      onSearchChange("");
+    }
   };
 
   return (
     <div className="space-y-4 mb-6">
-      {/* Search Bar */}
       <div className="flex gap-2">
         <div className="relative flex-1">
           <Input
             type="text"
             placeholder="Search flashcards..."
-            value={searchTerm}
+            value={displaySearchTerm}
             onChange={handleSearchChange}
             className="w-full pl-10"
           />
@@ -84,63 +133,79 @@ export default function FlashcardsToolbar({ onSearchChange, onFilterChange }: Fl
         </div>
       </div>
 
-      {/* Filter Bar */}
       <div className="flex flex-wrap gap-3 items-center">
-        {/* CEFR Level Filter */}
-        <div className="w-40">
-          <Select value={filters.cefr_level || "all"} onValueChange={handleCefrLevelChange}>
-            <SelectTrigger>
-              <SelectValue placeholder="CEFR Level" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectItem value="all">All levels</SelectItem>
-                {Object.values(CEFR_LEVEL).map((level) => (
-                  <SelectItem key={level} value={level}>
-                    {level}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
+        <div className="w-40 h-9">
+          {isInitialLoading ? (
+            <Skeleton className="h-9 w-full rounded-md" />
+          ) : (
+            <Select value={filters.cefr_level || "all"} onValueChange={handleCefrLevelChange}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="CEFR Level" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectItem value="all">All levels</SelectItem>
+                  {Object.values(CEFR_LEVEL).map((level) => (
+                    <SelectItem key={level} value={level}>
+                      {level}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          )}
         </div>
 
-        {/* Sort By Filter */}
-        <div className="w-40">
-          <Select
-            value={filters.sort_by}
-            onValueChange={(value) => handleSortByChange(value as "created_at" | "cefr_level" | "front_content")}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Sort by" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectItem value="created_at">Creation date</SelectItem>
-                <SelectItem value="cefr_level">CEFR level</SelectItem>
-                <SelectItem value="front_content">Content</SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
+        <div className="w-40 h-9">
+          {isInitialLoading ? (
+            <Skeleton className="h-9 w-full rounded-md" />
+          ) : (
+            <Select
+              value={filters.sort_by}
+              onValueChange={(value) => handleSortByChange(value as "created_at" | "cefr_level" | "front_content")}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectItem value="created_at">Creation date</SelectItem>
+                  <SelectItem value="cefr_level">CEFR level</SelectItem>
+                  <SelectItem value="front_content">Content</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          )}
         </div>
 
-        {/* Sort Order Filter */}
-        <div className="w-40">
-          <Select value={filters.sort_order} onValueChange={(value) => handleSortOrderChange(value as "asc" | "desc")}>
-            <SelectTrigger>
-              <SelectValue placeholder="Sort order" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectItem value="desc">Descending</SelectItem>
-                <SelectItem value="asc">Ascending</SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
+        <div className="w-40 h-9">
+          {isInitialLoading ? (
+            <Skeleton className="h-9 w-full rounded-md" />
+          ) : (
+            <Select
+              value={filters.sort_order}
+              onValueChange={(value) => handleSortOrderChange(value as "asc" | "desc")}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Sort order" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectItem value="desc">Descending</SelectItem>
+                  <SelectItem value="asc">Ascending</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          )}
         </div>
 
-        {/* Reset Filters Button */}
-        <Button variant="outline" size="sm" onClick={handleResetFilters} className="ml-auto">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleResetFilters}
+          className="ml-auto"
+          disabled={isInitialLoading || areFiltersDefault(currentFilters)}
+        >
           Reset filters
         </Button>
       </div>
