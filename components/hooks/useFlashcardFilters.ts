@@ -73,6 +73,7 @@ function useFlashcardFilters(): UseFlashcardFiltersReturnType {
     router.push(url);
   }, [pathname, router, searchTerm, page, limit, filters]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedUpdateUrl = useCallback(debounce(updateUrl, 300), [updateUrl]);
 
   useEffect(() => {

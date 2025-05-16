@@ -54,6 +54,7 @@ export default function FlashcardsPage() {
 
   useEffect(() => {
     fetchFlashcards(filterParams);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchFlashcards]);
 
   const handleSearchChange = useCallback(
