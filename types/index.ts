@@ -249,3 +249,26 @@ export interface GenerationErrorLogListResponseDTO {
   data: GenerationErrorLogDTO[];
   pagination: PaginationDTO;
 }
+
+export interface FlashcardFilterParams {
+  cefr_level?: CefrLevel;
+  sort_by?: "created_at" | "cefr_level" | "front_content";
+  sort_order?: "asc" | "desc";
+}
+
+export interface FlashcardSearchParams {
+  searchTerm: string;
+}
+
+export interface FlashcardsPageParams extends FlashcardSearchParams, FlashcardFilterParams {
+  page: number;
+  limit: number;
+}
+
+export interface EditFlashcardFormData {
+  front_content: string;
+  back_content: string;
+  cefr_level: CefrLevel;
+  front_language: string;
+  back_language: string;
+}
