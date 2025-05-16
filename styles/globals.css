@@ -120,3 +120,24 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Flashcard flip animation utilities */
+@layer utilities {
+  .perspective-1000 {
+    perspective: 1000px;
+    height: 100%;
+  }
+
+  .transform-style-3d {
+    transform-style: preserve-3d;
+    position: relative;
+  }
+
+  .backface-hidden {
+    backface-visibility: hidden;
+  }
+
+  .rotateY-180 {
+    transform: rotateY(180deg);
+  }
+}
