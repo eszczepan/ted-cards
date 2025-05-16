@@ -1,106 +1,236 @@
 "use client";
 
-import { useState } from "react";
-import FlashcardsHeader from "@/components/flashcards/FlashcardsHeader";
+import { useState, useEffect, useCallback, useRef } from "react";
 import FlashcardsToolbar from "@/components/flashcards/FlashcardsToolbar";
 import FlashcardsList from "@/components/flashcards/FlashcardsList";
-import { FlashcardDTO, FlashcardFilterParams } from "@/types";
+import FlashcardEditModal from "@/components/flashcards/FlashcardEditModal";
+import FlashcardDeleteModal from "@/components/flashcards/FlashcardDeleteModal";
+import FlashcardCreateModal from "@/components/flashcards/FlashcardCreateModal";
+import useFlashcards from "@/components/hooks/useFlashcards";
+import { FlashcardDTO, FlashcardFilterParams, FlashcardsPageParams, UpdateFlashcardDTO } from "@/types";
+import FlashcardsHeader from "@/components/flashcards/FlashcardsHeader";
 
-const mockFlashcards: FlashcardDTO[] = [
-  {
-    id: "1",
-    front_content: "Hello",
-    back_content: "Cześć",
-    front_language: "en",
-    back_language: "pl",
-    cefr_level: "A1",
-    source: "manual",
-    source_youtube_url: null,
-    generation_id: null,
-    status: "active",
-    created_at: new Date(),
-    updated_at: new Date(),
-  },
-  {
-    id: "2",
-    front_content: "Goodbye",
-    back_content: "Do widzenia",
-    front_language: "en",
-    back_language: "pl",
-    cefr_level: "A1",
-    source: "manual",
-    source_youtube_url: null,
-    generation_id: null,
-    status: "active",
-    created_at: new Date(),
-    updated_at: new Date(),
-  },
-  {
-    id: "3",
-    front_content: "Thank you",
-    back_content: "Dziękuję",
-    front_language: "en",
-    back_language: "pl",
-    cefr_level: "A1",
-    source: "manual",
-    source_youtube_url: null,
-    generation_id: null,
-    status: "active",
-    created_at: new Date(),
-    updated_at: new Date(),
-  },
-];
-
-// Mock pagination data
-const mockPagination = {
+const DEFAULT_FILTERS: FlashcardsPageParams = {
   page: 1,
   limit: 10,
-  total: 3,
-  pages: 1,
+  searchTerm: "",
+  cefr_level: undefined,
+  sort_by: "created_at",
+  sort_order: "desc",
 };
 
+function areFiltersDefault(filters: FlashcardsPageParams): boolean {
+  return (
+    filters.sort_by === DEFAULT_FILTERS.sort_by &&
+    filters.sort_order === DEFAULT_FILTERS.sort_order &&
+    (!filters.searchTerm || filters.searchTerm === "") &&
+    filters.page === DEFAULT_FILTERS.page &&
+    filters.cefr_level === DEFAULT_FILTERS.cefr_level
+  );
+}
+
 export default function FlashcardsPage() {
-  const [flashcards, setFlashcards] = useState<FlashcardDTO[]>(mockFlashcards);
-  const [pagination, setPagination] = useState(mockPagination);
-  const [isLoading, setIsLoading] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [selectedFlashcard, setSelectedFlashcard] = useState<FlashcardDTO | null>(null);
+  const [searchInputValue, setSearchInputValue] = useState("");
+
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const {
+    flashcards,
+    pagination,
+    isLoading,
+    isInitialLoading,
+    isError,
+    fetchFlashcards,
+    deleteFlashcard,
+    updateFlashcard,
+    createFlashcard,
+  } = useFlashcards();
+
+  const [filterParams, setFilterParams] = useState<FlashcardsPageParams>(DEFAULT_FILTERS);
+
+  useEffect(() => {
+    fetchFlashcards(filterParams);
+  }, [fetchFlashcards]);
+
+  const handleSearchChange = useCallback(
+    (term: string) => {
+      setSearchInputValue(term);
+
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+
+      searchTimeoutRef.current = setTimeout(() => {
+        const updatedFilters = {
+          ...filterParams,
+          searchTerm: term,
+          page: 1,
+        };
+
+        setFilterParams(updatedFilters);
+        fetchFlashcards(updatedFilters);
+      }, 500);
+    },
+    [filterParams, fetchFlashcards]
+  );
+
+  useEffect(() => {
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const handleFilterChange = (newFilters: Partial<FlashcardFilterParams>) => {
+    const updatedFilters = {
+      ...filterParams,
+      ...newFilters,
+    };
+
+    setFilterParams(updatedFilters);
+    fetchFlashcards(updatedFilters);
+  };
+
+  const handleResetAll = (defaultParams: FlashcardsPageParams) => {
+    if (areFiltersDefault(filterParams)) {
+      return;
+    }
+
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    setSearchInputValue("");
+
+    setFilterParams(defaultParams);
+    fetchFlashcards(defaultParams);
+  };
 
   const handlePageChange = (page: number) => {
-    console.log(`Changing to page ${page}`);
-    // In a real implementation, this would fetch the new page
+    const updatedFilters = {
+      ...filterParams,
+      page,
+    };
+
+    setFilterParams(updatedFilters);
+    fetchFlashcards(updatedFilters);
   };
 
   const handleEditFlashcard = (flashcard: FlashcardDTO) => {
-    console.log(`Edit flashcard with id ${flashcard.id}`);
-    // In a real implementation, this would open the edit modal
+    setSelectedFlashcard(flashcard);
+    setEditModalOpen(true);
+  };
+
+  const handleSaveFlashcard = async (id: string, data: UpdateFlashcardDTO) => {
+    try {
+      await updateFlashcard(id, data);
+      setEditModalOpen(false);
+      setSelectedFlashcard(null);
+    } catch (error) {
+      console.error("Failed to save edit:", error);
+      setEditModalOpen(false);
+      setSelectedFlashcard(null);
+    }
   };
 
   const handleDeleteFlashcard = (flashcard: FlashcardDTO) => {
-    console.log(`Delete flashcard with id ${flashcard.id}`);
-    // In a real implementation, this would open the delete modal
+    setSelectedFlashcard(flashcard);
+    setDeleteModalOpen(true);
   };
 
-  const handleSearchChange = (term: string) => {
-    console.log(`Search term: ${term}`);
-    // In a real implementation, this would update the search term and fetch results
+  const handleConfirmDelete = async (id: string) => {
+    try {
+      await deleteFlashcard(id);
+      setDeleteModalOpen(false);
+      setSelectedFlashcard(null);
+    } catch (error) {
+      console.error("Failed to delete:", error);
+      setDeleteModalOpen(false);
+      setSelectedFlashcard(null);
+    }
   };
 
-  const handleFilterChange = (filters: FlashcardFilterParams) => {
-    console.log("Filters changed:", filters);
-    // In a real implementation, this would update the filters and fetch results
+  const handleCreateFlashcard = async (data: {
+    front_content: string;
+    back_content: string;
+    front_language: string;
+    back_language: string;
+    cefr_level: string;
+  }) => {
+    try {
+      await createFlashcard(data);
+      setCreateModalOpen(false);
+      fetchFlashcards(filterParams);
+    } catch (error) {
+      console.error("Failed to create flashcard:", error);
+    }
   };
 
   return (
-    <div className="container mx-auto py-8">
-      <FlashcardsHeader totalFlashcards={pagination.total} />
-      <FlashcardsToolbar onSearchChange={handleSearchChange} onFilterChange={handleFilterChange} />
+    <>
+      <FlashcardsHeader
+        totalFlashcards={pagination.total}
+        isLoading={isLoading}
+        isInitialLoading={isInitialLoading}
+        onCreateNew={() => setCreateModalOpen(true)}
+      />
+
+      <FlashcardsToolbar
+        onSearchChange={handleSearchChange}
+        onFilterChange={handleFilterChange}
+        onReset={handleResetAll}
+        searchValue={searchInputValue}
+        isInitialLoading={isInitialLoading}
+        currentFilters={filterParams}
+      />
+
+      {isError && (
+        <div className="bg-destructive/10 text-destructive p-4 rounded-md mb-4">
+          <p className="font-medium">Error loading flashcards</p>
+          <p className="text-sm">{isError.message}</p>
+        </div>
+      )}
+
       <FlashcardsList
         flashcards={flashcards}
         pagination={pagination}
         isLoading={isLoading}
+        isInitialLoading={isInitialLoading}
         onPageChange={handlePageChange}
         onEditFlashcard={handleEditFlashcard}
         onDeleteFlashcard={handleDeleteFlashcard}
       />
-    </div>
+
+      <FlashcardEditModal
+        isOpen={editModalOpen}
+        flashcard={selectedFlashcard}
+        onClose={() => {
+          setEditModalOpen(false);
+          setSelectedFlashcard(null);
+        }}
+        onSave={handleSaveFlashcard}
+      />
+
+      <FlashcardDeleteModal
+        isOpen={deleteModalOpen}
+        flashcard={selectedFlashcard}
+        onClose={() => {
+          setDeleteModalOpen(false);
+          setSelectedFlashcard(null);
+        }}
+        onConfirm={handleConfirmDelete}
+      />
+
+      <FlashcardCreateModal
+        isOpen={createModalOpen}
+        onClose={() => setCreateModalOpen(false)}
+        onCreate={handleCreateFlashcard}
+      />
+    </>
   );
 }
