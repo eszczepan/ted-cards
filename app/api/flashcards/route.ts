@@ -2,10 +2,77 @@ import { NextResponse } from "next/server";
 import { createFlashcardsSchema } from "./schema";
 import { FlashcardService } from "@/lib/services/flashcard.service";
 import { createClient } from "@/supabase/supabase.server";
+import { CefrLevel, FlashcardStatus } from "@/types";
+
+export async function GET(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+
+    const search = searchParams.get("search") || "";
+    const cefr_level = searchParams.get("cefr_level") as CefrLevel | null;
+    const status = (searchParams.get("status") as FlashcardStatus | null) || "active";
+
+    const sort_by = searchParams.get("sort_by") || "created_at";
+    const sort_order = (searchParams.get("sort_order") || "desc") as "asc" | "desc";
+
+    const page = parseInt(searchParams.get("page") || "1", 12);
+    const limit = parseInt(searchParams.get("limit") || "12", 12);
+
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return NextResponse.json(
+        {
+          error: "Authentication required",
+          details: "User must be logged in to access flashcards",
+        },
+        { status: 401 }
+      );
+    }
+
+    const flashcardService = new FlashcardService();
+
+    try {
+      const result = await flashcardService.getFlashcards(user.id, {
+        page,
+        limit,
+        search,
+        cefr_level,
+        status,
+        sort_by,
+        sort_order,
+      });
+
+      return NextResponse.json({
+        data: result.flashcards,
+        pagination: {
+          page,
+          limit,
+          total: result.total,
+          pages: Math.ceil(result.total / limit),
+        },
+      });
+    } catch (error) {
+      console.error("Error fetching flashcards:", error);
+      return NextResponse.json(
+        {
+          error: "Failed to fetch flashcards",
+          message: error instanceof Error ? error.message : "Unknown error",
+        },
+        { status: 500 }
+      );
+    }
+  } catch (error) {
+    console.error("Error processing flashcard request:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
+}
 
 export async function POST(request: Request) {
   try {
-    // 1. Parse and validate request data
     const body = await request.json();
     const validationResult = createFlashcardsSchema.safeParse(body);
 
@@ -21,7 +88,6 @@ export async function POST(request: Request) {
 
     const validatedData = validationResult.data;
 
-    // 2. Create Supabase client and get authenticated user ID
     const supabase = await createClient();
     const {
       data: { user },
@@ -39,18 +105,15 @@ export async function POST(request: Request) {
 
     const user_id = user.id;
 
-    // 3. Use FlashcardService to create flashcards
     const flashcardService = new FlashcardService();
 
     try {
-      // Create flashcards in database
       const createdFlashcards = await flashcardService.createFlashcards(
         user_id,
         validatedData.flashcards,
         validatedData.generation_id || null
       );
 
-      // Return successful response
       return NextResponse.json(
         {
           success: true,
