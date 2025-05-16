@@ -5,16 +5,25 @@ import {
   UpdateFlashcardDTO,
   FlashcardsPageParams,
   FlashcardListResponseDTO,
+  FLASHCARD_SOURCE,
 } from "@/types";
 
 interface UseFlashcardsReturnType {
   flashcards: FlashcardDTO[];
   pagination: PaginationDTO;
   isLoading: boolean;
+  isInitialLoading: boolean;
   isError: Error | null;
   fetchFlashcards: (params: FlashcardsPageParams) => Promise<void>;
   deleteFlashcard: (id: string) => Promise<void>;
   updateFlashcard: (id: string, data: UpdateFlashcardDTO) => Promise<void>;
+  createFlashcard: (data: {
+    front_content: string;
+    back_content: string;
+    front_language: string;
+    back_language: string;
+    cefr_level: string;
+  }) => Promise<void>;
 }
 
 /**
@@ -30,6 +39,7 @@ function useFlashcards(): UseFlashcardsReturnType {
     pages: 0,
   });
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isInitialLoading, setIsInitialLoading] = useState<boolean>(true);
   const [isError, setIsError] = useState<Error | null>(null);
 
   /**
@@ -41,7 +51,6 @@ function useFlashcards(): UseFlashcardsReturnType {
     setIsError(null);
 
     try {
-      // Convert parameters to query string
       const queryParams = new URLSearchParams();
 
       if (params.searchTerm) {
@@ -50,6 +59,10 @@ function useFlashcards(): UseFlashcardsReturnType {
 
       if (params.cefr_level) {
         queryParams.append("cefr_level", params.cefr_level);
+      }
+
+      if (params.status) {
+        queryParams.append("status", params.status);
       }
 
       if (params.sort_by) {
@@ -63,7 +76,6 @@ function useFlashcards(): UseFlashcardsReturnType {
       queryParams.append("page", params.page.toString());
       queryParams.append("limit", params.limit.toString());
 
-      // Fetch data from API
       const response = await fetch(`/api/flashcards?${queryParams.toString()}`);
 
       if (!response.ok) {
@@ -79,6 +91,7 @@ function useFlashcards(): UseFlashcardsReturnType {
       console.error("Error fetching flashcards:", error);
     } finally {
       setIsLoading(false);
+      setIsInitialLoading(false);
     }
   }, []);
 
@@ -99,10 +112,8 @@ function useFlashcards(): UseFlashcardsReturnType {
         throw new Error(`API error: ${response.status}`);
       }
 
-      // Update local state after successful deletion
       setFlashcards((prevFlashcards) => prevFlashcards.filter((flashcard) => flashcard.id !== id));
 
-      // Update pagination total count
       setPagination((prev) => ({
         ...prev,
         total: prev.total - 1,
@@ -139,7 +150,6 @@ function useFlashcards(): UseFlashcardsReturnType {
 
       const updatedFlashcard: FlashcardDTO = await response.json();
 
-      // Update local state with the updated flashcard
       setFlashcards((prevFlashcards) =>
         prevFlashcards.map((flashcard) => (flashcard.id === id ? updatedFlashcard : flashcard))
       );
@@ -151,14 +161,74 @@ function useFlashcards(): UseFlashcardsReturnType {
     }
   }, []);
 
+  /**
+   * Create a new flashcard
+   * @param data - Data for the new flashcard
+   */
+  const createFlashcard = useCallback(
+    async (data: {
+      front_content: string;
+      back_content: string;
+      front_language: string;
+      back_language: string;
+      cefr_level: string;
+    }): Promise<void> => {
+      setIsLoading(true);
+      setIsError(null);
+
+      try {
+        const flashcardData = {
+          flashcards: [
+            {
+              ...data,
+              source: FLASHCARD_SOURCE.MANUAL,
+            },
+          ],
+        };
+
+        const response = await fetch(`/api/flashcards`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(flashcardData),
+        });
+
+        if (!response.ok) {
+          throw new Error(`API error: ${response.status}`);
+        }
+
+        const result = await response.json();
+
+        if (result.flashcards && result.flashcards.length > 0) {
+          setFlashcards((prevFlashcards) => [...result.flashcards, ...prevFlashcards]);
+
+          setPagination((prev) => ({
+            ...prev,
+            total: prev.total + 1,
+          }));
+        }
+      } catch (error) {
+        setIsError(error instanceof Error ? error : new Error("Unknown error occurred"));
+        console.error("Error creating flashcard:", error);
+        throw error;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    []
+  );
+
   return {
     flashcards,
     pagination,
     isLoading,
+    isInitialLoading,
     isError,
     fetchFlashcards,
     deleteFlashcard,
     updateFlashcard,
+    createFlashcard,
   };
 }
 
