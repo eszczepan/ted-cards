@@ -1,4 +1,4 @@
-import { Brain, LibraryBig, FileText, HelpCircle, Home, LogOut, Send, Settings } from "lucide-react";
+import { Brain, FileText, HelpCircle, Home, LogOut, Send, Settings } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -23,11 +23,6 @@ const items = [
     title: "My Flashcards",
     url: "/flashcards",
     icon: Brain,
-  },
-  {
-    title: "Collections",
-    url: "/collections",
-    icon: LibraryBig,
   },
   {
     title: "Settings",
