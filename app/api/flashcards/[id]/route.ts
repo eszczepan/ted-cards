@@ -3,7 +3,7 @@ import { FlashcardService } from "@/lib/services/flashcard.service";
 import { createClient } from "@/supabase/supabase.server";
 import { updateFlashcardSchema } from "../schema";
 
-export async function GET(_request: Request, { params }: { params: { id: string } }) {
+export async function GET(request: Request, { params }: { params: { id: string } }) {
   try {
     const id = params.id;
 
