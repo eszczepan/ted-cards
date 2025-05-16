@@ -18,17 +18,17 @@ export function Footer() {
               <h3 className="font-semibold text-lg mb-3">Useful Links</h3>
               <ul className="space-y-2">
                 <li>
-                  <Link href="#powerful-ai" className="text-gray-600 hover:text-gray-900 text-sm">
+                  <Link href="/#powerful-ai" className="text-gray-600 hover:text-gray-900 text-sm">
                     Powerful AI
                   </Link>
                 </li>
                 <li>
-                  <Link href="#how-it-works" className="text-gray-600 hover:text-gray-900 text-sm">
+                  <Link href="/#how-it-works" className="text-gray-600 hover:text-gray-900 text-sm">
                     How It Works
                   </Link>
                 </li>
                 <li>
-                  <Link href="#who-is-it-for" className="text-gray-600 hover:text-gray-900 text-sm">
+                  <Link href="/#who-is-it-for" className="text-gray-600 hover:text-gray-900 text-sm">
                     Who is it for?
                   </Link>
                 </li>
