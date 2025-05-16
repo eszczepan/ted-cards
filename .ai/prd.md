@@ -60,7 +60,7 @@ Dodatkowo, brak automatyzacji w generowaniu treści powoduje, że nauka języka 
 - Aplikacja nie wdraża zaawansowanych algorytmów powtórek na wzór SuperMemo czy Anki (korzystamy z gotowego rozwiazania, biblioteka open source).
 - Nie przewidziano śledzenia postępów, statystyk ani dziennych streaków.
 - Importowanie wielu formatów (PDF, DOCX, itp.) nie jest w zakresie MVP.
-- Nie wspieramy współdzielenia zestawów fiszek między użytkownikami.
+- Nie wspieramy współdzielenia fiszek między użytkownikami.
 - Brak personalizacji tematycznej nauki (np. egzamin, specjalistyczna terminologia).
 - Aplikacja będzie dostępna wyłącznie jako rozwiązanie webowe, bez natywnych aplikacji mobilnych.
 - Synchronizacja danych pomiędzy urządzeniami nie jest priorytetem na tym etapie.
@@ -88,7 +88,7 @@ Kryteria akceptacji:
 
 ID: US-005
 Tytuł: Przegląd i zatwierdzanie propozycji fiszek
-Opis: Jako zalogowany użytkownik chcę móc przeglądać wygenerowane fiszki i decydować, które z nich chcę dodać do mojego zestawu, aby zachować tylko przydatne pytania i odpowiedzi.
+Opis: Jako zalogowany użytkownik chcę móc przeglądać wygenerowane fiszki i decydować, które z nich chcę dodać do moich fiszek, aby zachować tylko przydatne pytania i odpowiedzi.
 Kryteria akceptacji:
 
 - Lista wygenerowanych fiszek jest wyświetlana pod formularzem generowania.
@@ -168,7 +168,7 @@ Kryteria akceptacji:
 
 ID: US-011
 Tytuł: Usuwanie fiszek
-Opis: Jako zalogowany użytkownik chcę usuwać zbędne fiszki, aby zachować porządek w moim zestawie.
+Opis: Jako zalogowany użytkownik chcę usuwać zbędne fiszki, aby zachować porządek w moich fiszkach.
 Kryteria akceptacji:
 
 - Przy każdej fiszce na liście (w widoku "Moje fiszki") widoczna jest opcja usunięcia.
@@ -196,6 +196,25 @@ Kryteria akceptacji:
 - Użytkownik może się wylogować z systemu poprzez przycisk w sidebarze jezeli jest zalogowany.
 - Nie korzystamy z zewnętrznych serwisów logowania (np. Google, GitHub).
 - Odzyskiwanie hasła powinno być możliwe.
+
+ID: US-014
+Tytuł: Przegląd zaakceptowanych fiszek
+Opis: Jako zalogowany użytkownik chcę mieć wgląd jakie fiszki zostały przeze mnie zaakceptowane i móc wyszukiwać daną fiszkę lub przeglądać posortowane fiszki.
+Kryteria akceptacji:
+
+- Po wejściu na podstronę "Moje fiszki" widzę wszystkie moje zaakceptowane fiszki.
+- Fiszki defaultowo są posortowane od najnowszej do najstarszej.
+- Opcja wyszukiwarki fiszki pomaga w znalezieniu konkretnej lub konkretnych fiszek.
+- Opcja sortowania po poziomie CEFR pozwala na posortowanie i wyfiltrowanie fiszek dla wskazanego poziomu.
+
+ID: US-015
+Tytuł: Edycja zapisanych fiszek
+Opis: Jako zalogowany użytkownik chcę mieć mozliwość edycji zaakceptowanych i zapisanych fiszek.
+
+- Przy każdej fiszce na liście (w widoku "Moje fiszki") widoczna jest opcja edycji.
+- Po wybraniu edycji użytkownik moze wprowadzic swoje zmiany
+- Uzytkownik musi potwierdzić operację, zanim fiszka zostanie trwale zedytowana.
+- Fiszki zostają trwale zedytowane w bazie danych po potwierdzeniu.
 
 ## 6. Metryki sukcesu
 
