@@ -51,8 +51,8 @@ Architektura interfejsu użytkownika dla TedCards dzieli aplikację na dwa głó
 
    - **Ścieżka widoku:** `/flashcards`
    - **Główny cel:** Prezentacja wygenerowanych propozycji fiszek oraz umożliwienie zarządzania nimi.
-   - **Kluczowe informacje:** Lista fiszek z podziałem na statusy (zatwierdzone, edytowane, odrzucone), podgląd treści fiszki (przód/tył) i poziom CEFR.
-   - **Kluczowe komponenty:** Komponent listy, karty fiszek, przyciski akcji (zaakceptuj, edytuj, usuń), przycisk zbiorczego zapisu zmian.
+   - **Kluczowe informacje:** Lista fiszek zaakceptowanych przez uzytkownika i podgląd treści fiszki (przód/tył) i poziom CEFR.
+   - **Kluczowe komponenty:** Komponent listy, karty fiszek.
    - **Uwagi UX/dostępności:** Jasne ikony i etykiety, wsparcie dla obsługi klawiaturą oraz czytników ekranu.
 
 6. **Flashcard Edit Modal**
