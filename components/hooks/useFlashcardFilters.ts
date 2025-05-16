@@ -27,8 +27,8 @@ function useFlashcardFilters(): UseFlashcardFiltersReturnType {
 
   // Parse initial state from URL query parameters
   const initialSearchTerm = searchParams.get("search") || "";
-  const initialPage = parseInt(searchParams.get("page") || "1", 10);
-  const initialLimit = parseInt(searchParams.get("limit") || "10", 10);
+  const initialPage = parseInt(searchParams.get("page") || "1", 12);
+  const initialLimit = parseInt(searchParams.get("limit") || "12", 12);
   const initialCefrLevel = searchParams.get("cefr_level") as CefrLevel | undefined;
   const initialSortBy = (searchParams.get("sort_by") || "created_at") as "created_at" | "cefr_level" | "front_content";
   const initialSortOrder = (searchParams.get("sort_order") || "desc") as "asc" | "desc";
@@ -55,7 +55,7 @@ function useFlashcardFilters(): UseFlashcardFiltersReturnType {
       params.set("page", page.toString());
     }
 
-    if (limit !== 10) {
+    if (limit !== 12) {
       params.set("limit", limit.toString());
     }
 
@@ -83,15 +83,14 @@ function useFlashcardFilters(): UseFlashcardFiltersReturnType {
     debouncedUpdateUrl();
   }, [searchTerm, page, filters, debouncedUpdateUrl]);
 
-  // Handler functions with URL sync
   const setSearchTerm = (term: string) => {
     setSearchTermState(term);
-    setPageState(1); // Reset to first page on search change
+    setPageState(1);
   };
 
   const setFilters = (newFilters: Partial<FlashcardFilterParams>) => {
     setFiltersState((prev) => ({ ...prev, ...newFilters }));
-    setPageState(1); // Reset to first page on filter change
+    setPageState(1);
   };
 
   const setPage = (newPage: number) => {
@@ -107,7 +106,6 @@ function useFlashcardFilters(): UseFlashcardFiltersReturnType {
     });
   };
 
-  // Build query parameters for API requests
   const buildQueryParams = (): FlashcardsPageParams => {
     return {
       searchTerm: searchTerm,
