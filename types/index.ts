@@ -254,6 +254,7 @@ export interface FlashcardFilterParams {
   cefr_level?: CefrLevel;
   sort_by?: "created_at" | "cefr_level" | "front_content";
   sort_order?: "asc" | "desc";
+  status?: FlashcardStatus;
 }
 
 export interface FlashcardSearchParams {
