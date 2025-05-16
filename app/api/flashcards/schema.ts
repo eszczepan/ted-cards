@@ -66,7 +66,19 @@ export const createFlashcardsResponseSchema = z.object({
   flashcards: z.array(flashcardResponseSchema),
 });
 
+export const updateFlashcardSchema = z.object({
+  front_content: z.string().max(200, "Front content cannot exceed 200 characters").optional(),
+  back_content: z.string().max(500, "Back content cannot exceed 500 characters").optional(),
+  front_language: z.string().min(2, "Front language is required").optional(),
+  back_language: z.string().min(2, "Back language is required").optional(),
+  cefr_level: z
+    .enum([CEFR_LEVEL.A1, CEFR_LEVEL.A2, CEFR_LEVEL.B1, CEFR_LEVEL.B2, CEFR_LEVEL.C1, CEFR_LEVEL.C2])
+    .optional(),
+  status: z.enum([FLASHCARD_STATUS.ACTIVE, FLASHCARD_STATUS.INACTIVE]).optional(),
+});
+
 export type CreateFlashcardRequest = z.infer<typeof createFlashcardSchema>;
 export type CreateFlashcardsRequest = z.infer<typeof createFlashcardsSchema>;
 export type FlashcardResponse = z.infer<typeof flashcardResponseSchema>;
 export type CreateFlashcardsResponse = z.infer<typeof createFlashcardsResponseSchema>;
+export type UpdateFlashcardRequest = z.infer<typeof updateFlashcardSchema>;
