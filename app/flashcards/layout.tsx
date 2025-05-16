@@ -15,11 +15,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Ted Cards - 2025",
-  description: "Ted Cards - 2025",
+  title: "Flashcards | TedCards",
+  description: "Manage your flashcards with TedCards",
 };
 
-export default function DashboardLayout({
+export default function FlashcardsLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -35,7 +35,7 @@ export default function DashboardLayout({
               {children}
             </main>
             <footer className="text-center text-sm text-muted-foreground py-4 mt-8 max-w-5xl mx-auto w-full">
-              Ted Cards - 2025
+              TedCards - 2025
             </footer>
           </div>
         </SidebarProvider>
