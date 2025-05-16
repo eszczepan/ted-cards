@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 import { createClient } from "@/supabase/supabase.server";
 import { FlashcardDTO, FLASHCARD_STATUS, FlashcardStatus, CefrLevel, FlashcardSource } from "@/types";
-import type { CreateFlashcardRequest } from "@/app/api/flashcards/schema";
+import type { CreateFlashcardRequest, UpdateFlashcardRequest } from "@/app/api/flashcards/schema";
 
 interface DatabaseFlashcard {
   id: string;
@@ -122,6 +122,169 @@ export class FlashcardService {
     } catch (logError) {
       // Just log to console if we can't log to the database
       console.error("Failed to log flashcard creation error:", logError);
+    }
+  }
+
+  /**
+   * Gets a single flashcard by ID and validates user ownership
+   * @param id Flashcard ID
+   * @param userId User ID who should own the flashcard
+   * @returns The flashcard if found and owned by the user, null otherwise
+   */
+  async getFlashcardById(id: string, userId: string): Promise<FlashcardDTO | null> {
+    try {
+      const supabase = await createClient();
+      const { data, error } = await supabase.from("flashcards").select("*").eq("id", id).eq("user_id", userId).single();
+
+      if (error) {
+        console.error("Error fetching flashcard:", error);
+        return null;
+      }
+
+      if (!data) {
+        return null;
+      }
+
+      return this.mapToFlashcardDTOs([data as DatabaseFlashcard])[0];
+    } catch (error) {
+      console.error("Error in getFlashcardById:", error);
+      return null;
+    }
+  }
+
+  /**
+   * Updates a flashcard
+   * @param id Flashcard ID to update
+   * @param userId User ID who should own the flashcard
+   * @param data Updated flashcard data
+   * @returns The updated flashcard
+   */
+  async updateFlashcard(id: string, userId: string, data: UpdateFlashcardRequest): Promise<FlashcardDTO | null> {
+    try {
+      const supabase = await createClient();
+      const now = new Date().toISOString();
+
+      const updateData = {
+        ...data,
+        updated_at: now,
+      };
+
+      const { data: updatedData, error } = await supabase
+        .from("flashcards")
+        .update(updateData)
+        .eq("id", id)
+        .eq("user_id", userId)
+        .select("*")
+        .single();
+
+      if (error) {
+        console.error("Error updating flashcard:", error);
+        throw new Error(`Failed to update flashcard: ${error.message}`);
+      }
+
+      return this.mapToFlashcardDTOs([updatedData as DatabaseFlashcard])[0];
+    } catch (error) {
+      console.error("Error in updateFlashcard:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Deletes a flashcard
+   * @param id Flashcard ID to delete
+   * @param userId User ID who should own the flashcard
+   */
+  async deleteFlashcard(id: string, userId: string): Promise<void> {
+    try {
+      const supabase = await createClient();
+      const { error } = await supabase.from("flashcards").delete().eq("id", id).eq("user_id", userId);
+
+      if (error) {
+        console.error("Error deleting flashcard:", error);
+        throw new Error(`Failed to delete flashcard: ${error.message}`);
+      }
+    } catch (error) {
+      console.error("Error in deleteFlashcard:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Gets flashcards from the database with pagination, filtering and sorting
+   * @param userId User ID for the flashcards
+   * @param options Options for filtering, sorting and pagination
+   * @returns Flashcards and total count
+   */
+  async getFlashcards(
+    userId: string,
+    options: {
+      page: number;
+      limit: number;
+      search?: string;
+      cefr_level?: CefrLevel | null;
+      status?: FlashcardStatus;
+      sort_by?: string;
+      sort_order?: "asc" | "desc";
+    }
+  ): Promise<{ flashcards: FlashcardDTO[]; total: number }> {
+    try {
+      const supabase = await createClient();
+      const {
+        page = 1,
+        limit = 12,
+        search = "",
+        cefr_level = null,
+        status = FLASHCARD_STATUS.ACTIVE,
+        sort_by = "created_at",
+        sort_order = "desc",
+      } = options;
+
+      // Calculate offset for pagination
+      const offset = (page - 1) * limit;
+
+      // Start building the query
+      let query = supabase
+        .from("flashcards")
+        .select("*", { count: "exact" })
+        .eq("user_id", userId)
+        .eq("status", status);
+
+      // Add CEFR level filter if provided
+      if (cefr_level) {
+        query = query.eq("cefr_level", cefr_level);
+      }
+
+      // Add text search if provided
+      if (search) {
+        query = query.or(`front_content.ilike.%${search}%,back_content.ilike.%${search}%`);
+      }
+
+      // Add sorting
+      if (sort_by && ["created_at", "cefr_level", "front_content"].includes(sort_by)) {
+        query = query.order(sort_by, { ascending: sort_order === "asc" });
+      } else {
+        query = query.order("created_at", { ascending: false });
+      }
+
+      // Add pagination
+      query = query.range(offset, offset + limit - 1);
+
+      // Execute the query
+      const { data, error, count } = await query;
+
+      if (error) {
+        console.error("Error fetching flashcards:", error);
+        throw new Error(`Failed to fetch flashcards: ${error.message}`);
+      }
+
+      const total = count || 0;
+      return {
+        flashcards: this.mapToFlashcardDTOs(data as DatabaseFlashcard[]),
+        total,
+      };
+    } catch (error) {
+      console.error("Error in getFlashcards:", error);
+      throw error;
     }
   }
 }
