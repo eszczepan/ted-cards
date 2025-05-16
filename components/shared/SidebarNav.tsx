@@ -47,6 +47,11 @@ const helpItems = [
     url: "/terms",
     icon: FileText,
   },
+  {
+    title: "Privacy Policy",
+    url: "/privacy",
+    icon: FileText,
+  },
 ];
 
 export function SidebarNav() {
