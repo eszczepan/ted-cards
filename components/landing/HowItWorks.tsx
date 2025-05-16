@@ -3,7 +3,7 @@ import { HelpCircle, ClipboardList, LayoutDashboard, MessageCircle, Cog, Share2 
 
 export function HowItWorks() {
   return (
-    <section className="w-full py-12 md:py-24 bg-gray-50" data-testid="how-it-works-section">
+    <section id="how-it-works" className="w-full py-12 md:py-24 bg-gray-50" data-testid="how-it-works-section">
       <div className="container max-w-screen-xl mx-auto px-4 md:px-6">
         <AnimatedHeading>
           <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">

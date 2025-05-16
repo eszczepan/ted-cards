@@ -3,7 +3,11 @@ import { Users, BookOpen, BrainCog, Globe, Check } from "lucide-react";
 
 export function Testimonials() {
   return (
-    <section className="w-full py-12 md:py-24 relative overflow-hidden" data-testid="testimonial-section">
+    <section
+      id="who-is-it-for"
+      className="w-full py-12 md:py-24 relative overflow-hidden"
+      data-testid="testimonial-section"
+    >
       <div className="container max-w-screen-xl mx-auto px-4 md:px-6">
         <AnimatedHeading>
           <div className="flex flex-col items-center justify-center space-y-4 text-center mb-16">

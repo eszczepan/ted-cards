@@ -6,7 +6,7 @@ import { Youtube, FileText, Award } from "lucide-react";
 
 export function Features() {
   return (
-    <section className="w-full py-12 md:py-24 bg-white" data-testid="feature-section">
+    <section id="powerful-ai" className="w-full py-12 md:py-24 bg-white" data-testid="feature-section">
       <div className="container max-w-screen-xl mx-auto px-4 md:px-6">
         <AnimatedHeading>
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
