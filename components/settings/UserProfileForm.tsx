@@ -116,10 +116,10 @@ export function UserProfileForm({ user }: UserProfileFormProps) {
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          placeholder="Leave blank to keep current password"
+          placeholder="Set new password"
           disabled={isTestAccount}
         />
-        <p className="text-xs text-muted-foreground">Password must be at least 8 characters long</p>
+        <p className="text-xs text-muted-foreground">Password must be at least 6 characters long</p>
       </div>
 
       <div className="space-y-2">
