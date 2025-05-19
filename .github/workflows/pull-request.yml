@@ -116,6 +116,6 @@ jobs:
           cache: "npm"
 
       - name: Run AI Reviewer
-        uses: eszczepan/ghaction-ai-reviewer@master
+        uses: eszczepan/ghaction-ai-reviewer@feat/code-reviewer
         with:
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
