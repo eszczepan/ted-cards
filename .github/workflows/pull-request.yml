@@ -100,63 +100,22 @@ jobs:
           path: playwright-report/
           retention-days: 7
 
-  status-comment:
-    name: PR Status Comment
+  ai-reviewer:
+    name: AI Reviewer
     if: ${{ success() && !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled') }}
     needs: [test-unit, test-e2e]
     runs-on: ubuntu-latest
-    timeout-minutes: 2
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Download unit test coverage
-        uses: actions/download-artifact@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          name: unit-test-coverage
-          path: coverage
+          node-version-file: ".nvmrc"
+          cache: "npm"
 
-      - name: Download E2E test report
-        uses: actions/download-artifact@v4
+      - name: Run AI Reviewer
+        uses: eszczepan/ghaction-ai-reviewer@master
         with:
-          name: playwright-report
-          path: playwright-report
-
-      - name: Create comment with test results
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const fs = require('fs');
-            let unitCoverageExists = false;
-            let e2eReportExists = false;
-
-            try {
-              fs.accessSync('./coverage/index.html');
-              unitCoverageExists = true;
-            } catch (error) {
-              console.log('Unit test coverage report not found');
-            }
-
-            try {
-              fs.accessSync('./playwright-report/index.html');
-              e2eReportExists = true;
-            } catch (error) {
-              console.log('E2E test report not found');
-            }
-
-            const comment = `## 🚀 Pull Request Checks Completed
-
-            ### ✅ All checks passed successfully!
-
-            **Unit Tests:** ${unitCoverageExists ? 'Passed with coverage' : 'Passed'}
-            **E2E Tests:** ${e2eReportExists ? 'Passed with report' : 'Passed'}
-            **Linting:** Passed
-
-            Great job! Your code is ready for review.`;
-
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: comment
-            });
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
